@@ -6,8 +6,10 @@ import {
 } from '@angular/core';
 
 /**
- * The browse feed, tucked into a sticky slide-out. A tab pinned to the right
- * edge (a bottom-right FAB on phones) toggles the panel; the feed lives inside.
+ * The rolling playlists, tucked into a sticky slide-out. A VERTICAL tab pinned
+ * to the right screen edge (a bottom-right FAB on phones) toggles the panel; the
+ * playlists (`<app-playlists>`) live inside. The browse feed is the full-page
+ * main view now, so the two trade places — this panel is the pan-out companion.
  *
  * Desktop: a right-side panel. Mobile: a bottom sheet — the same markup, driven
  * by CSS media queries so we never cram a side panel onto a phone.

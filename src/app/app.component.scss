@@ -141,6 +141,18 @@
   }
 }
 
+/* Navigation items (Profile) read as neutral → cyan, not the destructive
+   red the Sign out item uses on hover. */
+.account-item--nav {
+  color: var(--xt-text);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--xt-cyan-soft);
+    color: var(--xt-cyan);
+  }
+}
+
 @keyframes account-menu-in {
   from {
     opacity: 0;
@@ -212,18 +224,6 @@
   &:hover {
     background: linear-gradient(135deg, var(--xt-red-600) 0%, var(--xt-red-700) 100%);
     border-color: transparent;
-  }
-}
-
-/* Cyan-accented so "link your number" reads as a distinct, inviting action
-   against the neutral Sign out button. */
-.header-btn--link {
-  border-color: rgba(102, 238, 251, 0.35);
-  color: var(--xt-cyan);
-
-  &:hover {
-    background: var(--xt-cyan-soft);
-    border-color: var(--xt-cyan-600);
   }
 }
 

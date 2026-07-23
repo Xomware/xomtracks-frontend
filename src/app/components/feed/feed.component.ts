@@ -1,9 +1,9 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SharesService } from '../../services/shares.service';
 import { MeService } from '../../services/me.service';
 import { RatingsService } from '../../services/ratings.service';
-import { LinkPhoneUiService } from '../../services/link-phone-ui.service';
 import {
   Direction,
   Platform,
@@ -65,6 +65,10 @@ export class FeedComponent implements OnInit, OnDestroy {
    * panel supplies its own) and tighten padding. */
   @Input() embedded = false;
 
+  /** Optional starting source (e.g. a `/?feed=rated` deep link from the
+   * profile's "My rated" quick link). Applied once, before the first load. */
+  @Input() initialMode?: FeedMode;
+
   mode: FeedMode = 'in';
   window: TimeWindow = 'month';
   search = '';
@@ -82,7 +86,6 @@ export class FeedComponent implements OnInit, OnDestroy {
   state: LoadState = 'loading';
   private allShares: Share[] = [];
   private sub?: Subscription;
-  private linkedSub?: Subscription;
 
   /** Bumped on every successful load so the grouping memo invalidates. */
   private dataVersion = 0;
@@ -97,21 +100,30 @@ export class FeedComponent implements OnInit, OnDestroy {
     private sharesService: SharesService,
     private meService: MeService,
     private ratingsService: RatingsService,
-    private linkUi: LinkPhoneUiService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
+    // As the app's main view, the feed honours a `?feed=<source>` deep link
+    // (the profile's "My rated" quick link). An explicit @Input wins over it.
+    const requested = this.initialMode ?? this.resolveModeFromQuery();
+    if (requested) this.mode = requested;
     this.restoreView();
-    // A successful link should refresh the Mine tab if it's the active view.
-    this.linkedSub = this.linkUi.linked$.subscribe(() => {
-      if (this.mode === 'mine') this.load();
-    });
     this.load();
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
-    this.linkedSub?.unsubscribe();
+  }
+
+  /** A valid `?feed=<source>` query value, or undefined when absent/unknown. */
+  private resolveModeFromQuery(): FeedMode | undefined {
+    const requested = this.route.snapshot.queryParamMap.get('feed');
+    if (requested && FEED_SOURCES.some((s) => s.value === requested)) {
+      return requested as FeedMode;
+    }
+    return undefined;
   }
 
   setMode(mode: FeedMode): void {
@@ -120,9 +132,10 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.load();
   }
 
-  /** Open the "Link your number" modal from the Mine-tab prompt. */
+  /** The Mine-tab prompt sends the caller to their profile, where linking a
+   * number now lives (the header modal was removed). */
   openLink(): void {
-    this.linkUi.requestOpen();
+    this.router.navigate(['/profile']);
   }
 
   get isMine(): boolean {
@@ -265,12 +278,16 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   // ── Genre filter ──────────────────────────────────────────────────
-  /** Distinct, non-empty genres present in the loaded window, sorted. */
+  /** Distinct, non-empty genres present in the loaded window, sorted. Each
+   * share now carries a `genres` array, so we flatten every list, trim, dedupe,
+   * and sort into the dropdown's options. */
   get genres(): string[] {
     const set = new Set<string>();
     for (const s of this.allShares) {
-      const g = s.genre?.trim();
-      if (g) set.add(g);
+      for (const raw of s.genres ?? []) {
+        const g = raw?.trim();
+        if (g) set.add(g);
+      }
     }
     return [...set].sort((a, b) => a.localeCompare(b));
   }
@@ -495,11 +512,14 @@ export class FeedComponent implements OnInit, OnDestroy {
         (byKey.get(trackKey(rep)) ?? [rep]).some((s) => this.matchesSearch(s, q)),
       );
     }
-    // Genre filter — a group shows if any underlying share carries the genre.
+    // Genre filter — a group shows if any underlying share lists the genre
+    // (each share's `genres` is an array, e.g. ['tech house','house']).
     if (this.genre) {
       const g = this.genre;
       filteredReps = filteredReps.filter((rep) =>
-        (byKey.get(trackKey(rep)) ?? [rep]).some((s) => s.genre?.trim() === g),
+        (byKey.get(trackKey(rep)) ?? [rep]).some((s) =>
+          (s.genres ?? []).some((entry) => entry?.trim() === g),
+        ),
       );
     }
     // "My rated" — only tracks the caller has rated (myRating > 0).

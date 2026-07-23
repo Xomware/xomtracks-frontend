@@ -4,9 +4,9 @@ import { CognitoService } from '../../services/cognito.service';
 /**
  * The app home at route `''`.
  *
- * Signed in: the Playlists home is the primary screen — the two rolling
- * playlists front and centre (reusing `<app-playlists>`) — with the browse
- * feed tucked into a sticky slide-out panel (`<app-feed-panel>`).
+ * Signed in: the browse feed is the primary, full-page screen (reusing
+ * `<app-feed>` — list/tile toggle, search, ×N grouping, ratings), with the two
+ * rolling playlists tucked into a sticky slide-out panel (`<app-feed-panel>`).
  *
  * Signed out: the public landing pitch (`<app-landing>`).
  *

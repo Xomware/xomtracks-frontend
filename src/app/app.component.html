@@ -15,13 +15,8 @@
 
   <nav class="header-actions" *ngIf="cognito.isReady$ | async">
     <ng-container *ngIf="cognito.user$ | async as user; else signedOut">
-      <button
-        type="button"
-        class="header-btn header-btn--link"
-        (click)="openLinkModal()"
-      >Link number</button>
-
-      <!-- Account dropdown: username toggles a menu with Sign out. -->
+      <!-- Account dropdown: username toggles a menu with Profile + Sign out.
+           (Linking a number now lives on the Profile page, not the header.) -->
       <div class="account-menu">
         <button
           type="button"
@@ -41,6 +36,16 @@
           *ngIf="accountMenuOpen"
         >
           <li role="none">
+            <a
+              routerLink="/profile"
+              role="menuitem"
+              class="account-item account-item--nav"
+              (click)="closeAccountMenu()"
+            >
+              Profile
+            </a>
+          </li>
+          <li role="none">
             <button type="button" role="menuitem" class="account-item" (click)="signOut()">
               Sign out
             </button>
@@ -57,8 +62,3 @@
 <main class="app-main">
   <router-outlet></router-outlet>
 </main>
-
-<app-link-phone-modal
-  *ngIf="showLinkModal"
-  (closed)="closeLinkModal()"
-></app-link-phone-modal>

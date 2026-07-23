@@ -1,0 +1,189 @@
+<section class="profile">
+  <!-- Loading -->
+  <div class="pf-loading" *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading your profile">
+    <div class="pf-skeleton pf-skeleton--head"></div>
+    <div class="pf-skeleton-row">
+      <div class="pf-skeleton pf-skeleton--stat"></div>
+      <div class="pf-skeleton pf-skeleton--stat"></div>
+      <div class="pf-skeleton pf-skeleton--stat"></div>
+    </div>
+    <div class="pf-skeleton pf-skeleton--block"></div>
+  </div>
+
+  <!-- Error -->
+  <div class="pf-state" *ngIf="state === 'error'" role="alert">
+    <div class="pf-state-emoji" aria-hidden="true">⚠️</div>
+    <h2 class="pf-state-title">Couldn't load your profile</h2>
+    <p class="pf-state-text">Something went wrong reaching the Xomtracks API.</p>
+    <button type="button" class="pf-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <!-- Loaded -->
+  <ng-container *ngIf="state === 'loaded'">
+    <!-- Identity -->
+    <header class="pf-hero">
+      <span class="pf-avatar" aria-hidden="true">{{ avatarInitial }}</span>
+      <div class="pf-hero-body">
+        <p class="pf-eyebrow">Your profile</p>
+        <h1 class="pf-email" [title]="email">{{ email || 'Signed in' }}</h1>
+      </div>
+    </header>
+
+    <!-- Link your number: the single home for this (moved out of the header).
+         Admin-approval model — this is a REQUEST, not a trust-based auto-link. -->
+    <section class="pf-card pf-link-card" aria-labelledby="pf-link-h">
+      <div class="pf-link-head">
+        <h2 class="pf-card-title" id="pf-link-h">Your phone number</h2>
+        <span class="pf-optional">Optional</span>
+      </div>
+      <p class="pf-link-lede">
+        Request to link the phone number you text from, so Xomtracks knows which
+        songs are yours — they'll show under <strong>Mine</strong>. An admin
+        reviews each request. Mainly useful for members other than the group owner.
+      </p>
+
+      <!-- SUBMITTED: pending-approval acknowledgement. -->
+      <div class="pf-pending" *ngIf="linkRequested; else linkForm" role="status">
+        <span class="pf-pending-badge" aria-hidden="true">⧗</span>
+        <div class="pf-pending-body">
+          <p class="pf-pending-title">
+            Request submitted<ng-container *ngIf="requestedNumber"> · {{ requestedNumber }}</ng-container>
+          </p>
+          <p class="pf-pending-text">
+            Pending approval — an admin will review it shortly. Once approved,
+            your shares show under Mine.
+          </p>
+        </div>
+      </div>
+
+      <!-- ENTRY: request the link. -->
+      <ng-template #linkForm>
+        <form class="pf-link-form" (ngSubmit)="submitLinkRequest()">
+          <label class="pf-field-label" for="pf-phone">Phone number</label>
+          <div class="pf-field-row">
+            <input
+              id="pf-phone"
+              class="pf-field-input"
+              type="tel"
+              inputmode="tel"
+              autocomplete="tel"
+              name="phone"
+              placeholder="(336) 404-2196"
+              [(ngModel)]="linkPhone"
+              aria-describedby="pf-phone-hint"
+            />
+            <button type="submit" class="pf-link-btn" [disabled]="!canSubmitLinkRequest">
+              Request link
+            </button>
+          </div>
+          <p id="pf-phone-hint" class="pf-field-hint">
+            US numbers. We match on the last 10 digits — formatting doesn't matter.
+          </p>
+        </form>
+      </ng-template>
+    </section>
+
+    <!-- Totals -->
+    <div class="pf-stats" role="list" aria-label="Share totals">
+      <div class="pf-stat" role="listitem">
+        <span class="pf-stat-value">{{ totalShared }}</span>
+        <span class="pf-stat-label">Tracks in your feed</span>
+      </div>
+      <div class="pf-stat" role="listitem">
+        <span class="pf-stat-value">{{ sharedWithMe }}</span>
+        <span class="pf-stat-label">Shared with you</span>
+      </div>
+      <div class="pf-stat pf-stat--accent" role="listitem">
+        <span class="pf-stat-value">{{ sharedByMe }}</span>
+        <span class="pf-stat-label">Shared by you</span>
+      </div>
+    </div>
+
+    <div class="pf-cols">
+      <!-- Top sharers -->
+      <section class="pf-card" aria-labelledby="pf-sharers-h">
+        <h2 class="pf-card-title" id="pf-sharers-h">Top sharers</h2>
+        <ol class="pf-rank" *ngIf="topSharers.length; else noSharers">
+          <li class="pf-rank-row" *ngFor="let sharer of topSharers; trackBy: trackByLabel">
+            <span class="pf-rank-name">{{ sharer.label }}</span>
+            <span class="pf-rank-count">{{ sharer.count }}</span>
+          </li>
+        </ol>
+        <ng-template #noSharers>
+          <p class="pf-empty">No one's shared with you yet.</p>
+        </ng-template>
+      </section>
+
+      <!-- Top genres -->
+      <section class="pf-card" aria-labelledby="pf-genres-h">
+        <h2 class="pf-card-title" id="pf-genres-h">Top genres</h2>
+        <ul class="pf-genres" *ngIf="topGenres.length; else noGenres">
+          <li class="pf-genre" *ngFor="let genre of topGenres; trackBy: trackByLabel">
+            <span class="pf-genre-name">{{ genre.label }}</span>
+            <span class="pf-genre-count">{{ genre.count }}</span>
+          </li>
+        </ul>
+        <ng-template #noGenres>
+          <p class="pf-empty">No genres tagged on your tracks yet.</p>
+        </ng-template>
+      </section>
+    </div>
+
+    <!-- Top rated -->
+    <section class="pf-card" aria-labelledby="pf-rated-h">
+      <h2 class="pf-card-title" id="pf-rated-h">Your top-rated tracks</h2>
+      <ol class="pf-rated" *ngIf="topRated.length; else noRated">
+        <li class="pf-rated-row" *ngFor="let track of topRated; trackBy: trackByRated">
+          <span class="pf-rated-cover">
+            <img
+              *ngIf="hasArt(track.share); else ratedNoArt"
+              class="pf-rated-thumb"
+              [src]="track.share.albumArtUrl"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <ng-template #ratedNoArt>
+              <span class="pf-rated-thumb pf-rated-thumb--fallback" aria-hidden="true">♪</span>
+            </ng-template>
+          </span>
+          <span class="pf-rated-meta">
+            <span class="pf-rated-title">{{ track.title }}</span>
+            <span class="pf-rated-artist" *ngIf="track.artist">{{ track.artist }}</span>
+          </span>
+          <span class="pf-rated-stars" [attr.aria-label]="'You rated this ' + track.myRating + ' out of 5'">
+            <span
+              class="pf-star"
+              *ngFor="let filled of [1, 2, 3, 4, 5]"
+              [class.pf-star--on]="filled <= track.myRating"
+              aria-hidden="true"
+            >★</span>
+          </span>
+        </li>
+      </ol>
+      <ng-template #noRated>
+        <p class="pf-empty">You haven't rated any tracks yet.</p>
+      </ng-template>
+    </section>
+
+    <!-- Quick links -->
+    <nav class="pf-links" aria-label="Quick links">
+      <a class="pf-link" routerLink="/">
+        <span class="pf-link-ico" aria-hidden="true">▤</span>
+        <span class="pf-link-body">
+          <span class="pf-link-title">Your playlists</span>
+          <span class="pf-link-sub">The rolling Spotify playlists on your home</span>
+        </span>
+        <span class="pf-link-arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="pf-link" routerLink="/" [queryParams]="{ feed: 'rated' }">
+        <span class="pf-link-ico" aria-hidden="true">★</span>
+        <span class="pf-link-body">
+          <span class="pf-link-title">My rated</span>
+          <span class="pf-link-sub">Open the feed filtered to tracks you've rated</span>
+        </span>
+        <span class="pf-link-arrow" aria-hidden="true">→</span>
+      </a>
+    </nav>
+  </ng-container>
+</section>

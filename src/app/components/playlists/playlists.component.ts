@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   ROLLING_PLAYLISTS,
@@ -24,6 +24,10 @@ interface PlaylistView extends RollingPlaylist {
   styleUrls: ['./playlists.component.scss'],
 })
 export class PlaylistsComponent {
+  /** When hosted inside the slide-out panel, drop the section heading (the
+   * panel supplies its own) and tighten the outer padding. */
+  @Input() embedded = false;
+
   readonly playlists: PlaylistView[];
 
   constructor(sanitizer: DomSanitizer) {
