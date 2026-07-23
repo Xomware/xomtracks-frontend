@@ -1,0 +1,53 @@
+<article class="card" [class.card--unmatched]="share.matchStatus === 'unmatched'">
+  <div class="cover">
+    <img
+      *ngIf="hasArt; else noArt"
+      class="cover-img"
+      [src]="share.albumArtUrl"
+      [alt]="'Cover art for ' + title"
+      loading="lazy"
+      decoding="async"
+      (error)="onArtError()"
+    />
+    <ng-template #noArt>
+      <div class="cover-fallback" [attr.data-platform]="share.platform" aria-hidden="true">
+        <span class="cover-fallback-mark">♪</span>
+      </div>
+    </ng-template>
+
+    <span class="platform-badge" [attr.data-platform]="share.platform">
+      {{ platformLabel }}
+    </span>
+  </div>
+
+  <div class="body">
+    <div class="titles">
+      <h3 class="track-title" [title]="title">{{ title }}</h3>
+      <p class="track-artist" *ngIf="artist" [title]="artist">{{ artist }}</p>
+      <p class="track-artist track-artist--empty" *ngIf="!artist">—</p>
+    </div>
+
+    <span class="status-chip" *ngIf="statusChip as chip" [attr.data-kind]="chip.kind">
+      {{ chip.label }}
+    </span>
+
+    <div class="meta">
+      <span class="sharer">
+        <span class="sharer-avatar" aria-hidden="true">{{ sharerInitial }}</span>
+        <span class="sharer-name">{{ sharer }}</span>
+      </span>
+      <span class="dot-sep" aria-hidden="true">·</span>
+      <span class="date">{{ dateLabel }}</span>
+    </div>
+
+    <a
+      class="open-link"
+      [href]="primaryUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {{ primaryLinkLabel }}
+      <span class="open-arrow" aria-hidden="true">↗</span>
+    </a>
+  </div>
+</article>

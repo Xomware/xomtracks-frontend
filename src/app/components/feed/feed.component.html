@@ -1,0 +1,113 @@
+<section class="feed">
+  <div class="feed-head">
+    <div class="feed-titles">
+      <h1 class="feed-title">The feed</h1>
+      <p class="feed-sub" *ngIf="state === 'loaded'">
+        {{ shares.length }}
+        {{ shares.length === 1 ? 'share' : 'shares' }}<ng-container
+          *ngIf="isFiltered"
+        > matching “{{ search.trim() }}”</ng-container>
+        <ng-container *ngIf="!isFiltered && matchedCount">
+          · {{ matchedCount }} on Spotify</ng-container>
+      </p>
+    </div>
+
+    <label class="search">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        class="search-input"
+        [(ngModel)]="search"
+        placeholder="Search title, artist, sharer…"
+        aria-label="Search the feed"
+      />
+      <button
+        *ngIf="isFiltered"
+        type="button"
+        class="search-clear"
+        (click)="clearSearch()"
+        aria-label="Clear search"
+      >×</button>
+    </label>
+  </div>
+
+  <div class="controls">
+    <!-- Direction: shared with me / by me -->
+    <div class="segmented" role="tablist" aria-label="Direction">
+      <button
+        *ngFor="let d of directions"
+        type="button"
+        role="tab"
+        class="segmented-btn"
+        [class.segmented-btn--active]="direction === d.value"
+        [attr.aria-selected]="direction === d.value"
+        (click)="setDirection(d.value)"
+      >
+        {{ d.label }}
+      </button>
+    </div>
+
+    <!-- Time window -->
+    <div class="segmented segmented--windows" role="group" aria-label="Time window">
+      <button
+        *ngFor="let w of windows"
+        type="button"
+        class="segmented-btn"
+        [class.segmented-btn--active]="window === w.value"
+        [attr.aria-pressed]="window === w.value"
+        (click)="setWindow(w.value)"
+      >
+        {{ w.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading skeletons -->
+  <div class="grid" *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading shares">
+    <div class="skeleton" *ngFor="let s of skeletons">
+      <div class="skeleton-cover"></div>
+      <div class="skeleton-line skeleton-line--title"></div>
+      <div class="skeleton-line skeleton-line--sub"></div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="state-block state-block--error" *ngIf="state === 'error'" role="alert">
+    <div class="state-emoji" aria-hidden="true">⚠️</div>
+    <h2 class="state-title">Couldn't load the feed</h2>
+    <p class="state-text">Something went wrong reaching the Xomtracks API.</p>
+    <button type="button" class="state-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <!-- Loaded -->
+  <ng-container *ngIf="state === 'loaded'">
+    <div class="grid" *ngIf="shares.length; else empty">
+      <app-share-card
+        *ngFor="let share of shares; trackBy: trackByShareId"
+        [share]="share"
+      ></app-share-card>
+    </div>
+
+    <ng-template #empty>
+      <div class="state-block">
+        <div class="state-emoji" aria-hidden="true">{{ isFiltered ? '🔍' : '🎧' }}</div>
+        <h2 class="state-title">
+          {{ isFiltered ? 'No matches' : 'Nothing here yet' }}
+        </h2>
+        <p class="state-text" *ngIf="isFiltered">
+          No shares match “{{ search.trim() }}” in this window.
+        </p>
+        <p class="state-text" *ngIf="!isFiltered">
+          No {{ direction === 'in' ? 'songs shared with you' : 'songs you shared' }}
+          in this window. Try a wider range.
+        </p>
+        <button
+          type="button"
+          class="state-btn"
+          *ngIf="isFiltered"
+          (click)="clearSearch()"
+        >Clear search</button>
+      </div>
+    </ng-template>
+  </ng-container>
+</section>

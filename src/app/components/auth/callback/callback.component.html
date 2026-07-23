@@ -1,0 +1,24 @@
+<div class="auth-shell">
+  <div class="auth-card">
+    <a routerLink="/" class="auth-brand" aria-label="Xomtracks home">
+      <img src="assets/img/xomtracks-icon-256.png" alt="" width="48" height="48" />
+      <span>Xomtracks</span>
+    </a>
+
+    <ng-container *ngIf="!errored; else failed">
+      <h1 class="auth-title">Signing you in…</h1>
+      <p class="auth-subtitle">Hang tight — bringing you back to Xomtracks.</p>
+      <div class="callback-spinner">
+        <span class="spinner" aria-label="Completing sign-in"></span>
+      </div>
+    </ng-container>
+
+    <ng-template #failed>
+      <h1 class="auth-title">Sign-in didn't finish</h1>
+      <p class="auth-subtitle">Something interrupted the redirect. Try again.</p>
+      <div class="auth-actions">
+        <a routerLink="/auth/sign-in" class="auth-btn">Back to sign in</a>
+      </div>
+    </ng-template>
+  </div>
+</div>

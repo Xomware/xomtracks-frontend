@@ -1,0 +1,210 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--xt-surface);
+  border: 1px solid var(--xt-border);
+  border-radius: var(--xt-radius-lg);
+  overflow: hidden;
+  transition: transform var(--xt-transition), border-color var(--xt-transition),
+    box-shadow var(--xt-transition);
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: var(--xt-border-strong);
+    box-shadow: var(--xt-shadow-card);
+  }
+
+  &--unmatched {
+    opacity: 0.92;
+  }
+}
+
+.cover {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--xt-surface-2);
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--xt-surface-3) 0%, var(--xt-surface-2) 100%);
+
+  &[data-platform='spotify'] {
+    background: linear-gradient(135deg, #1db95433 0%, var(--xt-surface-2) 100%);
+  }
+  &[data-platform='soundcloud'] {
+    background: linear-gradient(135deg, #ff550033 0%, var(--xt-surface-2) 100%);
+  }
+  &[data-platform='apple'] {
+    background: linear-gradient(135deg, #fa57c133 0%, var(--xt-surface-2) 100%);
+  }
+}
+
+.cover-fallback-mark {
+  font-size: 2.6rem;
+  color: var(--xt-text-faint);
+  opacity: 0.7;
+}
+
+.platform-badge {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 3px 9px;
+  border-radius: var(--xt-radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  &[data-platform='spotify'] {
+    color: #1ed760;
+  }
+  &[data-platform='soundcloud'] {
+    color: #ff8a3d;
+  }
+  &[data-platform='apple'] {
+    color: #ff6ec7;
+  }
+}
+
+.body {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.titles {
+  min-width: 0;
+}
+
+.track-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin: 0 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-artist {
+  font-size: 0.85rem;
+  color: var(--xt-text-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &--empty {
+    color: var(--xt-text-faint);
+  }
+}
+
+.status-chip {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: var(--xt-radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid transparent;
+
+  &[data-kind='unmatched'] {
+    color: var(--xt-text-muted);
+    background: var(--xt-surface-3);
+    border-color: var(--xt-border-strong);
+  }
+  &[data-kind='pending'] {
+    color: var(--xt-cyan);
+    background: var(--xt-cyan-soft);
+    border-color: rgba(102, 238, 251, 0.3);
+  }
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--xt-text-muted);
+  margin-top: auto;
+}
+
+.sharer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sharer-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-cyan-700) 130%);
+  flex: none;
+}
+
+.sharer-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+.dot-sep {
+  color: var(--xt-text-faint);
+}
+
+.date {
+  flex: none;
+}
+
+.open-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--xt-cyan);
+  text-decoration: none;
+  padding: 4px 2px;
+  border-radius: var(--xt-radius-sm);
+  transition: color var(--xt-transition);
+
+  &:hover {
+    color: var(--xt-cyan-600);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+}
+
+.open-arrow {
+  font-size: 0.9em;
+}

@@ -1,0 +1,124 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px clamp(16px, 4vw, 28px);
+  background: var(--xt-header-bg);
+  border-bottom: 1px solid var(--xt-header-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+  border-radius: var(--xt-radius-sm);
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 4px;
+  }
+}
+
+.brand-banner {
+  display: block;
+  height: 42px;
+  width: auto;
+  max-width: 62vw;
+  object-fit: contain;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.account-email {
+  color: var(--xt-header-muted);
+  font-size: 13px;
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-link {
+  color: var(--xt-header-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 4px;
+  border-radius: var(--xt-radius-sm);
+  transition: color var(--xt-transition);
+
+  &:hover {
+    color: var(--xt-header-text);
+  }
+
+  &--active {
+    color: var(--xt-cyan);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+}
+
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 16px;
+  border-radius: var(--xt-radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--xt-header-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--xt-transition), border-color var(--xt-transition);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.28);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+}
+
+.header-btn--primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
+  color: #fff;
+
+  &:hover {
+    background: linear-gradient(135deg, var(--xt-red-600) 0%, var(--xt-red-700) 100%);
+    border-color: transparent;
+  }
+}
+
+.app-main {
+  display: block;
+}
+
+@media (max-width: 560px) {
+  .brand-banner {
+    height: 34px;
+    max-width: 58vw;
+  }
+
+  .account-email {
+    display: none;
+  }
+}

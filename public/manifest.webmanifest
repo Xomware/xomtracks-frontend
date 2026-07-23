@@ -1,0 +1,24 @@
+{
+  "name": "Xomtracks",
+  "short_name": "Xomtracks",
+  "description": "Browse the music your group shares across iMessage — every Spotify, SoundCloud and Apple Music link, in one feed.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0c0d12",
+  "theme_color": "#0c0d12",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

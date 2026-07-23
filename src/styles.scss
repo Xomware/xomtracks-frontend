@@ -1,0 +1,145 @@
+/* =====================================================================
+   Xomtracks — global design tokens + base styles
+   Brand: RED (primary, #ff3750) + CYAN (accent, #66eefb), sampled straight
+   from the app icon/banner. Xomtracks is a music feed, so it lives on a
+   permanent DARK canvas (the neon brushstroke logo needs it) — one theme,
+   tuned for cover-art-forward browsing. Tokens are CSS custom properties
+   so every surface reads from one source of truth.
+   ===================================================================== */
+
+:root {
+  /* ── Brand (fixed hues, sampled from the logo) ───────────────── */
+  --xt-red: #ff3750;
+  --xt-red-600: #f01f3d;
+  --xt-red-700: #cc1733;
+  --xt-red-300: #ff7385;
+  --xt-red-glow: rgba(255, 55, 80, 0.32);
+
+  --xt-cyan: #66eefb;
+  --xt-cyan-600: #29d7ec;
+  --xt-cyan-700: #16b4c9;
+  --xt-cyan-soft: rgba(102, 238, 251, 0.14);
+  --xt-cyan-glow: rgba(102, 238, 251, 0.3);
+
+  /* ── Semantic tokens — DARK canvas ───────────────────────────── */
+  --xt-bg: #0c0d12;
+  --xt-bg-2: #101118;
+  --xt-surface: #16181f;
+  --xt-surface-2: #1c1f28;
+  --xt-surface-3: #242833;
+  --xt-border: #262a35;
+  --xt-border-strong: #333846;
+
+  --xt-text: #f1f3f8;
+  --xt-text-muted: #a6adbd;
+  --xt-text-faint: #6f7688;
+
+  --xt-primary: var(--xt-red);
+  --xt-primary-hover: var(--xt-red-600);
+  --xt-primary-active: var(--xt-red-700);
+  --xt-on-primary: #ffffff;
+
+  --xt-accent: var(--xt-cyan);
+  --xt-accent-strong: var(--xt-cyan-600);
+
+  --xt-focus-ring: rgba(102, 238, 251, 0.6);
+
+  --xt-danger-text: #ff9d97;
+  --xt-danger-bg: rgba(255, 55, 80, 0.12);
+  --xt-danger-border: rgba(255, 55, 80, 0.4);
+
+  --xt-success-text: #58e08a;
+
+  /* Header sits on the deepest surface — the neon banner rides on it. */
+  --xt-header-bg: #0a0b0f;
+  --xt-header-border: rgba(255, 255, 255, 0.07);
+  --xt-header-text: #f1f3f8;
+  --xt-header-muted: #9aa2b3;
+
+  --xt-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --xt-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 12px 34px rgba(0, 0, 0, 0.4);
+
+  /* ── Scale ───────────────────────────────────────────────────── */
+  --xt-radius-sm: 6px;
+  --xt-radius: 10px;
+  --xt-radius-lg: 16px;
+  --xt-radius-pill: 999px;
+
+  --xt-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --xt-font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, 'Fira Code',
+    Consolas, monospace;
+
+  --xt-transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Base ──────────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--xt-bg);
+  color: var(--xt-text);
+  font-family: var(--xt-font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--xt-text);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--xt-cyan);
+}
+
+:focus-visible {
+  outline: 2px solid var(--xt-cyan);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--xt-red-glow);
+}
+
+/* Pre-bootstrap loader shown inside <app-root> until Angular paints. */
+.app-boot {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    filter: drop-shadow(0 0 22px var(--xt-red-glow));
+    animation: bootPulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes bootPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
