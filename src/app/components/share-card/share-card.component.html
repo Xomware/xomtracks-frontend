@@ -56,6 +56,13 @@
       <span class="date">{{ dateLabel }}</span>
     </div>
 
+    <app-rating-stars
+      class="card-rating"
+      [rating]="share.rating"
+      [trackKey]="trackKey"
+      (rate)="rate.emit($event)"
+    ></app-rating-stars>
+
     <a
       *ngIf="showOpenLink; else viewHint"
       class="card-open"

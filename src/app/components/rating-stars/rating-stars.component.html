@@ -1,0 +1,37 @@
+<div class="rating" [class.rating--md]="size === 'md'" [class.rating--disabled]="disabled">
+  <div
+    class="stars"
+    role="radiogroup"
+    [attr.aria-label]="ariaLabel"
+    (mouseleave)="onLeave()"
+  >
+    <button
+      *ngFor="let star of stars; let i = index"
+      type="button"
+      class="star"
+      role="radio"
+      [attr.aria-checked]="myRating === star"
+      [attr.aria-label]="starAriaLabel(star)"
+      [attr.tabindex]="myRating === star || (!myRating && star === 1) ? 0 : -1"
+      [attr.data-state]="starState(star)"
+      [disabled]="disabled"
+      (click)="select(star)"
+      (mouseenter)="onEnter(star)"
+      (focus)="onEnter(star)"
+      (blur)="onLeave()"
+      (keydown)="onKeydown($event, i)"
+    >
+      <span aria-hidden="true">★</span>
+    </button>
+  </div>
+
+  <span class="rating-summary" *ngIf="showSummary">
+    <ng-container *ngIf="count > 0; else noRatings">
+      <span class="rating-avg">{{ avgLabel }}</span>
+      <span class="rating-count">({{ count }})</span>
+    </ng-container>
+    <ng-template #noRatings>
+      <span class="rating-count rating-count--empty">Rate</span>
+    </ng-template>
+  </span>
+</div>

@@ -1,25 +1,25 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { LandingComponent } from './components/landing/landing.component';
-import { FeedComponent } from './components/feed/feed.component';
-import { PlaylistsComponent } from './components/playlists/playlists.component';
+import { HomeComponent } from './components/home/home.component';
 import { SignInComponent } from './components/auth/sign-in/sign-in.component';
 import { CallbackComponent } from './components/auth/callback/callback.component';
-import { authGuard } from './guards/auth.guard';
 
 /**
- * Route tree:
- *   ''            public landing tile — redirects signed-in users to /feed.
- *   /feed         the authed browse feed (authGuard).
- *   /playlists    the authed rolling-playlists hub (authGuard).
+ * Route tree (unified home):
+ *   ''            the app home — Playlists front-and-centre with the browse
+ *                 feed in a slide-out panel for signed-in users; the public
+ *                 landing pitch for everyone else. HomeComponent switches on
+ *                 auth state, so no guard is needed here.
+ *   /feed         legacy → home (the feed now lives in the home's side panel).
+ *   /playlists    legacy → home (playlists ARE the home).
  *   /auth/sign-in Hosted UI entry (SSO carry-over from any Xomware app).
  *   /auth/callback post-redirect landing.
  */
 const routes: Routes = [
-  { path: '', component: LandingComponent, pathMatch: 'full' },
-  { path: 'feed', component: FeedComponent, canActivate: [authGuard] },
-  { path: 'playlists', component: PlaylistsComponent, canActivate: [authGuard] },
+  { path: '', component: HomeComponent, pathMatch: 'full' },
+  { path: 'feed', redirectTo: '', pathMatch: 'full' },
+  { path: 'playlists', redirectTo: '', pathMatch: 'full' },
 
   { path: 'auth/sign-in', component: SignInComponent },
   { path: 'auth/callback', component: CallbackComponent },

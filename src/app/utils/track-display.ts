@@ -76,6 +76,37 @@ export function openLabel(share: Share): string {
   }
 }
 
+/**
+ * host + path (no query/hash/trailing slash), lowercased — so the same link
+ * shared in slightly different forms still groups together.
+ */
+export function normalizedUrl(raw?: string | null): string {
+  if (!raw) return '';
+  try {
+    const u = new URL(raw);
+    const path = u.pathname.replace(/\/+$/, '');
+    return `${u.host}${path}`.toLowerCase();
+  } catch {
+    return raw.trim().toLowerCase();
+  }
+}
+
+/**
+ * Identity for "same track" grouping — Spotify id when resolved (robust across
+ * URL formats), else the normalised source URL, else title+artist. Shared by
+ * the feed grouping, the modal's occurrence count, AND the ratings control so
+ * the ×N badge, "shared N times", and a whole-group rating all key on the same
+ * track. This is also the `trackKey` POSTed to `/ratings/set`.
+ */
+export function trackKey(share: Share): string {
+  if (share.resolvedSpotifyId) return `sp:${share.resolvedSpotifyId}`;
+  const url = normalizedUrl(share.sourceUrl);
+  if (url) return `url:${url}`;
+  const title = (share.trackTitle ?? '').trim().toLowerCase();
+  const artist = (share.trackArtist ?? '').trim().toLowerCase();
+  return `ta:${title}|${artist}`;
+}
+
 /** Turn the last path segment of a URL into a Title Cased label. */
 function slugFromUrl(url?: string | null): string {
   if (!url) return '';

@@ -1,0 +1,49 @@
+<!-- Sticky edge tab (desktop) / bottom-right FAB (mobile) that opens the feed. -->
+<button
+  type="button"
+  class="feed-tab"
+  [class.feed-tab--hidden]="open"
+  [attr.aria-expanded]="open"
+  aria-controls="feed-panel"
+  (click)="openPanel()"
+>
+  <span class="feed-tab-icon" aria-hidden="true">≡</span>
+  <span class="feed-tab-label">Browse feed</span>
+</button>
+
+<!-- Backdrop + panel, only mounted while open. -->
+<div
+  class="feed-scrim"
+  *ngIf="open"
+  (click)="onBackdropClick($event)"
+  (keydown)="onKeydown($event)"
+>
+  <aside
+    #panel
+    id="feed-panel"
+    class="feed-drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="feed-panel-title"
+    tabindex="-1"
+  >
+    <header class="feed-drawer-head">
+      <div class="feed-drawer-titles">
+        <span class="feed-drawer-eyebrow">Browse</span>
+        <h2 class="feed-drawer-title" id="feed-panel-title">The feed</h2>
+      </div>
+      <button
+        type="button"
+        class="feed-drawer-close"
+        (click)="close()"
+        aria-label="Close the feed"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <div class="feed-drawer-body">
+      <app-feed [embedded]="true"></app-feed>
+    </div>
+  </aside>
+</div>

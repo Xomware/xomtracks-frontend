@@ -407,3 +407,22 @@
     animation: none;
   }
 }
+
+/* ── Rating row ──────────────────────────────────────────────────── */
+.rate-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--xt-border);
+  border-radius: var(--xt-radius);
+  background: var(--xt-surface);
+}
+
+.rate-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--xt-text-muted);
+}

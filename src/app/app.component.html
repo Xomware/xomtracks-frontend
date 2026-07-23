@@ -15,16 +15,6 @@
 
   <nav class="header-actions" *ngIf="cognito.isReady$ | async">
     <ng-container *ngIf="cognito.user$ | async as user; else signedOut">
-      <a
-        routerLink="/feed"
-        routerLinkActive="header-link--active"
-        class="header-link"
-      >Feed</a>
-      <a
-        routerLink="/playlists"
-        routerLinkActive="header-link--active"
-        class="header-link"
-      >Playlists</a>
       <button
         type="button"
         class="header-btn header-btn--link"
