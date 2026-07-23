@@ -31,10 +31,12 @@ export class MeService {
 
   constructor(private http: HttpClient) {}
 
-  /** GET /me — the caller's linked handles + attributed share count. */
+  /** GET /me/get — the caller's linked handles + attributed share count.
+   * (The api-gateway module supports only 2 path levels, so this is /me/get,
+   * not /me — same reason the shares list is /shares/list.) */
   get(): Observable<MeInfo> {
     return this.http
-      .get<ApiEnvelope<MeInfo>>(this.baseUrl)
+      .get<ApiEnvelope<MeInfo>>(`${this.baseUrl}/get`)
       .pipe(map((res) => res.data));
   }
 

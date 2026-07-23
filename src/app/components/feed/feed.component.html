@@ -3,8 +3,8 @@
     <div class="feed-titles">
       <h1 class="feed-title">The feed</h1>
       <p class="feed-sub" *ngIf="state === 'loaded' && !mineUnlinked">
-        {{ shares.length }}
-        {{ shares.length === 1 ? 'share' : 'shares' }}<ng-container
+        {{ groupedShares.length }}
+        {{ groupedShares.length === 1 ? 'track' : 'tracks' }}<ng-container
           *ngIf="isFiltered"
         > matching “{{ search.trim() }}”</ng-container>
         <ng-container *ngIf="!isFiltered && matchedCount">
@@ -130,12 +130,14 @@
     </div>
 
     <ng-container *ngIf="!mineUnlinked">
-    <ng-container *ngIf="shares.length; else empty">
+    <ng-container *ngIf="groupedShares.length; else empty">
       <!-- TILE view -->
       <div class="grid" *ngIf="view === 'tile'">
         <app-share-card
-          *ngFor="let share of shares; trackBy: trackByShareId"
+          *ngFor="let share of groupedShares; trackBy: trackByShareId"
           [share]="share"
+          [shareCount]="groupCount(share)"
+          [sharerSummary]="sharerSummaryFor(share)"
           (open)="openDetail($event)"
         ></app-share-card>
       </div>
@@ -151,7 +153,7 @@
         </div>
         <div
           class="row"
-          *ngFor="let share of shares; trackBy: trackByShareId"
+          *ngFor="let share of groupedShares; trackBy: trackByShareId"
           [class.row--unmatched]="share.matchStatus === 'unmatched'"
         >
           <!-- Transparent overlay button = open details; sits under the
@@ -177,7 +179,14 @@
             </ng-template>
           </span>
           <span class="col-track">
-            <span class="row-title">{{ rowTitle(share) }}</span>
+            <span class="row-title-line">
+              <span class="row-title">{{ rowTitle(share) }}</span>
+              <span
+                class="count-badge count-badge--inline"
+                *ngIf="groupCount(share) > 1"
+                [attr.aria-label]="'shared ' + groupCount(share) + ' times'"
+              >×{{ groupCount(share) }}</span>
+            </span>
             <span class="row-artist">{{ rowArtist(share) }}</span>
           </span>
           <span class="col-platform">
@@ -187,7 +196,7 @@
           </span>
           <span class="col-sharer">
             <span class="sharer-avatar" aria-hidden="true">{{ sharerInitial(share) }}</span>
-            <span class="row-sharer-name">{{ sharerLabel(share) }}</span>
+            <span class="row-sharer-name">{{ rowSharerLabel(share) }}</span>
           </span>
           <span class="col-actions">
             <span class="col-date">{{ relativeDate(share) }}</span>
@@ -237,5 +246,6 @@
   [share]="share"
   [sharedTimes]="selectedSharedTimes"
   [otherSharers]="selectedOtherSharers"
+  [occurrences]="selectedOccurrences"
   (closed)="closeDetail()"
 ></app-track-detail-modal>

@@ -109,5 +109,20 @@
         </dd>
       </div>
     </dl>
+
+    <!-- Full per-share breakdown when the same track was shared more than once. -->
+    <section class="breakdown" *ngIf="showBreakdown">
+      <h3 class="breakdown-head">
+        Shared
+        <span class="count-badge">×{{ occurrences.length }}</span>
+      </h3>
+      <ul class="breakdown-list">
+        <li class="breakdown-item" *ngFor="let occ of occurrences; trackBy: trackByShareId">
+          <span class="sharer-avatar" aria-hidden="true">{{ occurrenceInitial(occ) }}</span>
+          <span class="breakdown-sharer">{{ occurrenceSharer(occ) }}</span>
+          <span class="breakdown-date">{{ occurrenceDate(occ) }}</span>
+        </li>
+      </ul>
+    </section>
   </div>
 </div>

@@ -64,6 +64,15 @@ export class FeedComponent implements OnInit, OnDestroy {
   private sub?: Subscription;
   private linkedSub?: Subscription;
 
+  /** Bumped on every successful load so the grouping memo invalidates. */
+  private dataVersion = 0;
+  private groupCache?: {
+    key: string;
+    reps: Share[];
+    countByKey: Map<string, number>;
+    sharersByKey: Map<string, string[]>;
+  };
+
   constructor(
     private sharesService: SharesService,
     private meService: MeService,
@@ -141,12 +150,12 @@ export class FeedComponent implements OnInit, OnDestroy {
       this.sub = this.meService.myShares(this.window).subscribe({
         next: (res) => {
           this.mineLinked = res.linked;
-          this.allShares = res.shares ?? [];
+          this.setShares(res.shares ?? []);
           this.state = 'loaded';
         },
         error: () => {
           this.mineLinked = null;
-          this.allShares = [];
+          this.setShares([]);
           this.state = 'error';
         },
       });
@@ -155,14 +164,19 @@ export class FeedComponent implements OnInit, OnDestroy {
 
     this.sub = this.sharesService.list(this.mode, this.window).subscribe({
       next: (res) => {
-        this.allShares = res.shares ?? [];
+        this.setShares(res.shares ?? []);
         this.state = 'loaded';
       },
       error: () => {
-        this.allShares = [];
+        this.setShares([]);
         this.state = 'error';
       },
     });
+  }
+
+  private setShares(shares: Share[]): void {
+    this.allShares = shares;
+    this.dataVersion++; // invalidate the grouping memo
   }
 
   /**
@@ -184,22 +198,32 @@ export class FeedComponent implements OnInit, OnDestroy {
     return out;
   }
 
-  /** Deduped window, narrowed by the client-side search box. */
-  get shares(): Share[] {
-    const base = this.dedupedShares;
-    const q = this.search.trim().toLowerCase();
-    if (!q) return base;
-    return base.filter((s) => {
-      const hay = [s.trackTitle, s.trackArtist, s.albumName, s.sharerName, s.sharerHandle]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-      return hay.includes(q);
-    });
+  /**
+   * The feed's displayed entries: exact-message dedup first (dedupedShares),
+   * then GROUPED by track so the same song shared to several people/dates
+   * collapses to ONE entry. Each entry is the most-recent share of its track;
+   * `groupCount()` gives the ×N. Narrowed by the search box at the group level
+   * (a group shows if any of its underlying shares matches).
+   */
+  get groupedShares(): Share[] {
+    return this.computeGroups().reps;
+  }
+
+  /** Number of underlying shares for a track group (the ×N badge). Matches the
+   * detail modal's "shared N times" exactly — both count occurrencesOf(). */
+  groupCount(share: Share): number {
+    return this.computeGroups().countByKey.get(this.trackKey(share)) ?? 1;
+  }
+
+  /** Summarised distinct sharers of a track group ("Tori, Jack +1"), for the
+   * shared-with-me direction. Empty for out/mine (sharer is always "you"). */
+  sharerSummaryFor(share: Share): string {
+    if (this.mode !== 'in') return '';
+    return this.summarizeSharers(this.groupSharers(share));
   }
 
   get matchedCount(): number {
-    return this.dedupedShares.filter(
+    return this.groupedShares.filter(
       (s) => s.matchStatus === 'matched' || s.matchStatus === 'manual',
     ).length;
   }
@@ -236,6 +260,15 @@ export class FeedComponent implements OnInit, OnDestroy {
     return names;
   }
 
+  /** Every underlying share of the selected track, newest-first — the modal's
+   * full per-share breakdown (sharer + date). Length == the card's ×N. */
+  get selectedOccurrences(): Share[] {
+    if (!this.selected) return [];
+    return [...this.occurrencesOf(this.selected)].sort(
+      (a, b) => (b.messageDate ?? 0) - (a.messageDate ?? 0),
+    );
+  }
+
   platformLabel(platform: Platform): string {
     return PLATFORM_LABELS[platform] ?? platform;
   }
@@ -265,8 +298,15 @@ export class FeedComponent implements OnInit, OnDestroy {
     return share.sharerName?.trim() || share.sharerHandle?.trim() || 'Unknown';
   }
 
+  /** List-row sharer: the grouped summary for shared-with-me, else the single
+   * sharer. Keeps the row consistent with the tile card. */
+  rowSharerLabel(share: Share): string {
+    const summary = this.sharerSummaryFor(share);
+    return summary || this.sharerLabel(share);
+  }
+
   sharerInitial(share: Share): string {
-    return (this.sharerLabel(share)[0] ?? '?').toUpperCase();
+    return (this.rowSharerLabel(share)[0] ?? '?').toUpperCase();
   }
 
   relativeDate(share: Share): string {
@@ -303,13 +343,114 @@ export class FeedComponent implements OnInit, OnDestroy {
     return this.dedupedShares.filter((s) => this.trackKey(s) === key);
   }
 
-  /** Identity for "same track" grouping — Spotify id when matched, else a
-   * normalised title+artist so unmatched dupes still cluster. */
+  /**
+   * Build the by-track groups over the exact-message-deduped window, memoised
+   * on (dataVersion, search). Returns the representative entries (most-recent
+   * share per track, newest-first), the ×N count per track key, and the
+   * distinct sharers per track key.
+   */
+  private computeGroups() {
+    const q = this.search.trim().toLowerCase();
+    const cacheKey = `${this.dataVersion}|${q}`;
+    if (this.groupCache?.key === cacheKey) return this.groupCache;
+
+    const byKey = new Map<string, Share[]>();
+    const order: string[] = [];
+    for (const s of this.dedupedShares) {
+      const k = this.trackKey(s);
+      let arr = byKey.get(k);
+      if (!arr) {
+        arr = [];
+        byKey.set(k, arr);
+        order.push(k);
+      }
+      arr.push(s);
+    }
+
+    const countByKey = new Map<string, number>();
+    const sharersByKey = new Map<string, string[]>();
+    const reps: Share[] = [];
+    for (const k of order) {
+      const arr = byKey.get(k)!;
+      countByKey.set(k, arr.length);
+      // Representative = the most recent share of the track.
+      const rep = arr.reduce((a, b) => ((b.messageDate ?? 0) > (a.messageDate ?? 0) ? b : a));
+      reps.push(rep);
+      // Distinct sharers, in first-seen order.
+      const seen = new Set<string>();
+      const names: string[] = [];
+      for (const sh of arr) {
+        const label = this.sharerLabel(sh);
+        if (seen.has(label)) continue;
+        seen.add(label);
+        names.push(label);
+      }
+      sharersByKey.set(k, names);
+    }
+
+    let filteredReps = reps;
+    if (q) {
+      filteredReps = reps.filter((rep) =>
+        (byKey.get(this.trackKey(rep)) ?? [rep]).some((s) => this.matchesSearch(s, q)),
+      );
+    }
+    filteredReps = [...filteredReps].sort((a, b) => (b.messageDate ?? 0) - (a.messageDate ?? 0));
+
+    this.groupCache = { key: cacheKey, reps: filteredReps, countByKey, sharersByKey };
+    return this.groupCache;
+  }
+
+  private groupSharers(share: Share): string[] {
+    return this.computeGroups().sharersByKey.get(this.trackKey(share)) ?? [];
+  }
+
+  private summarizeSharers(names: string[]): string {
+    if (names.length === 0) return '';
+    if (names.length === 1) return names[0];
+    if (names.length === 2) return `${names[0]}, ${names[1]}`;
+    return `${names[0]}, ${names[1]} +${names.length - 2}`;
+  }
+
+  private matchesSearch(share: Share, q: string): boolean {
+    const hay = [
+      share.trackTitle,
+      share.trackArtist,
+      share.albumName,
+      share.sharerName,
+      share.sharerHandle,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return hay.includes(q);
+  }
+
+  /**
+   * Identity for "same track" grouping — Spotify id when resolved (robust
+   * across URL formats), else the normalised source URL, else title+artist.
+   * Used by BOTH the feed grouping and the modal's occurrence count so the
+   * card's ×N and the modal's "shared N times" always agree.
+   */
   private trackKey(share: Share): string {
     if (share.resolvedSpotifyId) return `sp:${share.resolvedSpotifyId}`;
+    const url = this.normalizedUrl(share.sourceUrl);
+    if (url) return `url:${url}`;
     const title = (share.trackTitle ?? '').trim().toLowerCase();
     const artist = (share.trackArtist ?? '').trim().toLowerCase();
     return `ta:${title}|${artist}`;
+  }
+
+  /** host + path (no query/hash/trailing slash), lowercased — so the same link
+   * shared in slightly different forms still groups together. */
+  private normalizedUrl(raw?: string | null): string {
+    if (!raw) return '';
+    try {
+      const u = new URL(raw);
+      const path = u.pathname.replace(/\/+$/, '');
+      return `${u.host}${path}`.toLowerCase();
+    } catch {
+      return raw.trim().toLowerCase();
+    }
   }
 
   /** Identity for "same message" dedup — never collapses distinct shares. */
