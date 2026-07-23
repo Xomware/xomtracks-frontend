@@ -1,16 +1,18 @@
-import { Component, Input } from '@angular/core';
-import { Platform, Share } from '../../models/share.model';
-
-const PLATFORM_LABELS: Record<Platform, string> = {
-  spotify: 'Spotify',
-  soundcloud: 'SoundCloud',
-  apple: 'Apple Music',
-};
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Share } from '../../models/share.model';
+import {
+  displayTitle,
+  isMatched,
+  openLabel,
+  platformLabel,
+  primaryUrl,
+} from '../../utils/track-display';
 
 /**
- * Presentational card for a single share. Renders cover art + metadata, and
- * degrades honestly when a share is unmatched (no Spotify equivalent) or
- * still pending — showing the raw platform/link instead of a broken cover.
+ * Presentational card for a single share. Renders cover art + metadata, opens
+ * the detail modal when its trigger is activated, and — for shares with no
+ * Spotify match (SoundCloud / Apple / unresolved) — surfaces a prominent link
+ * straight to the original `sourceUrl` so a card is never a dead end.
  */
 @Component({
   selector: 'app-share-card',
@@ -20,12 +22,19 @@ const PLATFORM_LABELS: Record<Platform, string> = {
 export class ShareCardComponent {
   @Input({ required: true }) share!: Share;
 
+  /** Emitted when the card's trigger is activated so the feed opens the modal. */
+  @Output() open = new EventEmitter<Share>();
+
   /** Toggled true when the <img> fails, so the template swaps to the
    * fallback cover without leaving a broken image. */
   artFailed = false;
 
+  activate(): void {
+    this.open.emit(this.share);
+  }
+
   get platformLabel(): string {
-    return PLATFORM_LABELS[this.share.platform] ?? this.share.platform;
+    return platformLabel(this.share.platform);
   }
 
   get hasArt(): boolean {
@@ -33,23 +42,25 @@ export class ShareCardComponent {
   }
 
   get title(): string {
-    return this.share.trackTitle?.trim() || 'Unrecognised track';
+    return displayTitle(this.share);
   }
 
   get artist(): string {
     return this.share.trackArtist?.trim() || '';
   }
 
-  /** The best outbound link: Spotify when resolved, else the original share URL. */
-  get primaryUrl(): string {
-    if (this.share.resolvedSpotifyId) {
-      return `https://open.spotify.com/track/${this.share.resolvedSpotifyId}`;
-    }
-    return this.share.sourceUrl;
+  /** Only unmatched shares get an inline outbound link; matched tracks play
+   * from inside the modal. */
+  get showOpenLink(): boolean {
+    return !isMatched(this.share);
   }
 
-  get primaryLinkLabel(): string {
-    return this.share.resolvedSpotifyId ? 'Open in Spotify' : `Open on ${this.platformLabel}`;
+  get openUrl(): string {
+    return primaryUrl(this.share);
+  }
+
+  get openLinkLabel(): string {
+    return openLabel(this.share);
   }
 
   get sharer(): string {

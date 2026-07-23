@@ -1,0 +1,119 @@
+.playlists {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px clamp(16px, 4vw, 28px) 64px;
+}
+
+.pl-head {
+  margin-bottom: 24px;
+}
+
+.pl-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.pl-sub {
+  margin: 6px 0 0;
+  max-width: 60ch;
+  color: var(--xt-text-muted);
+  font-size: 0.92rem;
+}
+
+.pl-refresh {
+  display: inline-block;
+  margin-left: 4px;
+  color: var(--xt-cyan);
+  font-weight: 600;
+}
+
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.pl-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  background: var(--xt-surface);
+  border: 1px solid var(--xt-border);
+  border-radius: var(--xt-radius-lg);
+  border-top: 3px solid var(--xt-red);
+}
+
+.pl-card:nth-child(even) {
+  border-top-color: var(--xt-cyan);
+}
+
+.pl-card-head {
+  min-width: 0;
+}
+
+.pl-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.pl-card-blurb {
+  margin: 4px 0 0;
+  color: var(--xt-text-muted);
+  font-size: 0.86rem;
+}
+
+.pl-embed {
+  border-radius: var(--xt-radius);
+  overflow: hidden;
+  background: var(--xt-surface-2);
+  /* Reserve height so the layout doesn't jump while the iframe loads. */
+  min-height: 380px;
+}
+
+.pl-iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: var(--xt-radius);
+}
+
+.pl-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 9px 18px;
+  border-radius: var(--xt-radius-pill);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
+  box-shadow: 0 4px 14px var(--xt-red-glow);
+  transition: transform var(--xt-transition), box-shadow var(--xt-transition);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px var(--xt-red-glow);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+}
+
+.pl-open-arrow {
+  font-size: 0.9em;
+}
+
+@media (max-width: 560px) {
+  .pl-grid {
+    grid-template-columns: 1fr;
+  }
+}

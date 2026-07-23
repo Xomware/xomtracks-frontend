@@ -1,0 +1,113 @@
+<div
+  class="backdrop"
+  (click)="onBackdropClick($event)"
+  (keydown)="onKeydown($event)"
+>
+  <div
+    #dialog
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="track-detail-title"
+    tabindex="-1"
+  >
+    <button
+      type="button"
+      class="close-btn"
+      (click)="requestClose()"
+      aria-label="Close details"
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+
+    <div class="hero">
+      <div class="cover">
+        <img
+          *ngIf="hasArt; else noArt"
+          class="cover-img"
+          [src]="share.albumArtUrl"
+          [alt]="'Cover art for ' + title"
+          decoding="async"
+          (error)="onArtError()"
+        />
+        <ng-template #noArt>
+          <div class="cover-fallback" [attr.data-platform]="share.platform" aria-hidden="true">
+            <span class="cover-fallback-mark">♪</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="hero-body">
+        <span class="platform-badge" [attr.data-platform]="share.platform">
+          {{ platformLabel }}
+        </span>
+        <h2 class="detail-title" id="track-detail-title">{{ title }}</h2>
+        <p class="detail-artist" *ngIf="artist">{{ artist }}</p>
+        <p class="detail-album" *ngIf="album">{{ album }}</p>
+
+        <div class="stats" *ngIf="sharedTimes > 1 || otherSharers.length">
+          <span class="stat-pill">{{ sharedTimesLabel }}</span>
+          <span class="stat-pill stat-pill--muted" *ngIf="otherSharersLabel">
+            {{ otherSharersLabel }}
+          </span>
+        </div>
+
+        <a
+          class="play-link"
+          [href]="primaryUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ primaryLinkLabel }}
+          <span class="play-arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="embed" *ngIf="embedUrl as src" [attr.data-kind]="embedKind">
+      <iframe
+        class="embed-frame"
+        [src]="src"
+        [title]="title + ' — inline player'"
+        width="100%"
+        [height]="embedKind === 'soundcloud' ? 166 : 152"
+        frameborder="0"
+        loading="lazy"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      ></iframe>
+    </div>
+
+    <dl class="facts">
+      <div class="fact">
+        <dt>Direction</dt>
+        <dd>{{ directionLabel }}</dd>
+      </div>
+      <div class="fact">
+        <dt>{{ share.direction === 'in' ? 'From' : 'Sharer' }}</dt>
+        <dd class="fact-sharer">
+          <span class="sharer-avatar" aria-hidden="true">{{ sharerInitial }}</span>
+          {{ sharer }}
+        </dd>
+      </div>
+      <div class="fact">
+        <dt>Platform</dt>
+        <dd>{{ platformLabel }}</dd>
+      </div>
+      <div class="fact">
+        <dt>Shared on</dt>
+        <dd>{{ dateLabel }}</dd>
+      </div>
+      <div class="fact" *ngIf="album">
+        <dt>Album</dt>
+        <dd>{{ album }}</dd>
+      </div>
+      <div class="fact">
+        <dt>Match status</dt>
+        <dd>
+          <span class="match-dot" [class.match-dot--ok]="isMatched" aria-hidden="true"></span>
+          {{ matchStatusLabel }}
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>

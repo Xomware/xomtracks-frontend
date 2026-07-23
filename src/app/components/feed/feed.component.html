@@ -60,6 +60,28 @@
         {{ w.label }}
       </button>
     </div>
+
+    <!-- View toggle: tile grid / dense list -->
+    <div class="segmented segmented--view" role="group" aria-label="Layout">
+      <button
+        type="button"
+        class="segmented-btn view-btn"
+        [class.segmented-btn--active]="view === 'tile'"
+        [attr.aria-pressed]="view === 'tile'"
+        (click)="setView('tile')"
+      >
+        <span class="view-ico" aria-hidden="true">▦</span> Tiles
+      </button>
+      <button
+        type="button"
+        class="segmented-btn view-btn"
+        [class.segmented-btn--active]="view === 'list'"
+        [attr.aria-pressed]="view === 'list'"
+        (click)="setView('list')"
+      >
+        <span class="view-ico" aria-hidden="true">≡</span> List
+      </button>
+    </div>
   </div>
 
   <!-- Loading skeletons -->
@@ -81,12 +103,83 @@
 
   <!-- Loaded -->
   <ng-container *ngIf="state === 'loaded'">
-    <div class="grid" *ngIf="shares.length; else empty">
-      <app-share-card
-        *ngFor="let share of shares; trackBy: trackByShareId"
-        [share]="share"
-      ></app-share-card>
-    </div>
+    <ng-container *ngIf="shares.length; else empty">
+      <!-- TILE view -->
+      <div class="grid" *ngIf="view === 'tile'">
+        <app-share-card
+          *ngFor="let share of shares; trackBy: trackByShareId"
+          [share]="share"
+          (open)="openDetail($event)"
+        ></app-share-card>
+      </div>
+
+      <!-- LIST view: dense, chart-like rows -->
+      <div class="list" *ngIf="view === 'list'">
+        <div class="list-head" aria-hidden="true">
+          <span class="col-cover"></span>
+          <span class="col-track">Track</span>
+          <span class="col-platform">Platform</span>
+          <span class="col-sharer">Sharer</span>
+          <span class="col-date">Shared</span>
+        </div>
+        <div
+          class="row"
+          *ngFor="let share of shares; trackBy: trackByShareId"
+          [class.row--unmatched]="share.matchStatus === 'unmatched'"
+        >
+          <!-- Transparent overlay button = open details; sits under the
+               trailing "open" link so that link stays clickable. -->
+          <button
+            type="button"
+            class="row-trigger"
+            [attr.aria-label]="'View details for ' + rowTitle(share)"
+            (click)="openDetail(share)"
+          ></button>
+
+          <span class="col-cover">
+            <img
+              *ngIf="hasArt(share); else rowNoArt"
+              class="row-thumb"
+              [src]="share.albumArtUrl"
+              [alt]="''"
+              loading="lazy"
+              decoding="async"
+            />
+            <ng-template #rowNoArt>
+              <span class="row-thumb row-thumb--fallback" [attr.data-platform]="share.platform" aria-hidden="true">♪</span>
+            </ng-template>
+          </span>
+          <span class="col-track">
+            <span class="row-title">{{ rowTitle(share) }}</span>
+            <span class="row-artist">{{ rowArtist(share) }}</span>
+          </span>
+          <span class="col-platform">
+            <span class="platform-badge" [attr.data-platform]="share.platform">
+              {{ platformLabel(share.platform) }}
+            </span>
+          </span>
+          <span class="col-sharer">
+            <span class="sharer-avatar" aria-hidden="true">{{ sharerInitial(share) }}</span>
+            <span class="row-sharer-name">{{ sharerLabel(share) }}</span>
+          </span>
+          <span class="col-actions">
+            <span class="col-date">{{ relativeDate(share) }}</span>
+            <a
+              *ngIf="showOpenLink(share)"
+              class="row-open"
+              [attr.data-platform]="share.platform"
+              [href]="openUrl(share)"
+              target="_blank"
+              rel="noopener noreferrer"
+              [attr.aria-label]="openLinkLabel(share) + ' — ' + rowTitle(share)"
+            >
+              <span class="row-open-text">{{ openLinkLabel(share) }}</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </span>
+        </div>
+      </div>
+    </ng-container>
 
     <ng-template #empty>
       <div class="state-block">
@@ -111,3 +204,11 @@
     </ng-template>
   </ng-container>
 </section>
+
+<app-track-detail-modal
+  *ngIf="selected as share"
+  [share]="share"
+  [sharedTimes]="selectedSharedTimes"
+  [otherSharers]="selectedOtherSharers"
+  (closed)="closeDetail()"
+></app-track-detail-modal>

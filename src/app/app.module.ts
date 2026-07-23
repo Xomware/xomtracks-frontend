@@ -9,6 +9,8 @@ import { AppComponent } from './app.component';
 import { LandingComponent } from './components/landing/landing.component';
 import { FeedComponent } from './components/feed/feed.component';
 import { ShareCardComponent } from './components/share-card/share-card.component';
+import { TrackDetailModalComponent } from './components/track-detail-modal/track-detail-modal.component';
+import { PlaylistsComponent } from './components/playlists/playlists.component';
 import { SignInComponent } from './components/auth/sign-in/sign-in.component';
 import { CallbackComponent } from './components/auth/callback/callback.component';
 
@@ -20,6 +22,8 @@ import { jwtInterceptor } from './interceptors/jwt.interceptor';
     LandingComponent,
     FeedComponent,
     ShareCardComponent,
+    TrackDetailModalComponent,
+    PlaylistsComponent,
     SignInComponent,
     CallbackComponent,
   ],
