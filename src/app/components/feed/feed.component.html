@@ -2,7 +2,7 @@
   <div class="feed-head">
     <div class="feed-titles">
       <h1 class="feed-title">The feed</h1>
-      <p class="feed-sub" *ngIf="state === 'loaded'">
+      <p class="feed-sub" *ngIf="state === 'loaded' && !mineUnlinked">
         {{ shares.length }}
         {{ shares.length === 1 ? 'share' : 'shares' }}<ng-container
           *ngIf="isFiltered"
@@ -32,18 +32,28 @@
   </div>
 
   <div class="controls">
-    <!-- Direction: shared with me / by me -->
-    <div class="segmented" role="tablist" aria-label="Direction">
+    <!-- Feed source: shared with me / by me / mine -->
+    <div class="segmented" role="tablist" aria-label="Feed">
       <button
         *ngFor="let d of directions"
         type="button"
         role="tab"
         class="segmented-btn"
-        [class.segmented-btn--active]="direction === d.value"
-        [attr.aria-selected]="direction === d.value"
-        (click)="setDirection(d.value)"
+        [class.segmented-btn--active]="mode === d.value"
+        [attr.aria-selected]="mode === d.value"
+        (click)="setMode(d.value)"
       >
         {{ d.label }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="segmented-btn"
+        [class.segmented-btn--active]="mode === 'mine'"
+        [attr.aria-selected]="mode === 'mine'"
+        (click)="setMode('mine')"
+      >
+        Mine
       </button>
     </div>
 
@@ -103,6 +113,20 @@
 
   <!-- Loaded -->
   <ng-container *ngIf="state === 'loaded'">
+    <!-- Mine tab, but no number linked yet -->
+    <div class="state-block state-block--link" *ngIf="mineUnlinked">
+      <div class="state-emoji" aria-hidden="true">🔗</div>
+      <h2 class="state-title">See the songs you shared</h2>
+      <p class="state-text">
+        Link the phone number you text from and Xomtracks will show the tracks
+        you dropped into the group — attributed to you.
+      </p>
+      <button type="button" class="state-btn state-btn--primary" (click)="openLink()">
+        Link your number
+      </button>
+    </div>
+
+    <ng-container *ngIf="!mineUnlinked">
     <ng-container *ngIf="shares.length; else empty">
       <!-- TILE view -->
       <div class="grid" *ngIf="view === 'tile'">
@@ -191,8 +215,7 @@
           No shares match “{{ search.trim() }}” in this window.
         </p>
         <p class="state-text" *ngIf="!isFiltered">
-          No {{ direction === 'in' ? 'songs shared with you' : 'songs you shared' }}
-          in this window. Try a wider range.
+          {{ emptyText }} Try a wider range.
         </p>
         <button
           type="button"
@@ -202,6 +225,7 @@
         >Clear search</button>
       </div>
     </ng-template>
+    </ng-container>
   </ng-container>
 </section>
 

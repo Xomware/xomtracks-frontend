@@ -515,6 +515,29 @@ $list-cols: 44px minmax(0, 1fr) 116px 140px 148px;
   border-color: var(--xt-danger-border);
 }
 
+/* The "link your number" prompt on an unlinked Mine tab — cyan-accented,
+   solid (not dashed) so it reads as an invitation rather than an empty slot. */
+.state-block--link {
+  border-style: solid;
+  border-color: rgba(102, 238, 251, 0.28);
+  background: linear-gradient(180deg, var(--xt-cyan-soft) 0%, var(--xt-bg-2) 60%);
+}
+
+.state-btn--primary {
+  background: var(--xt-primary);
+  border-color: var(--xt-primary);
+  color: var(--xt-on-primary);
+
+  &:hover {
+    background: var(--xt-primary-hover);
+    border-color: var(--xt-primary-hover);
+  }
+
+  &:active {
+    background: var(--xt-primary-active);
+  }
+}
+
 /* Tablet: drop the platform column so rows stay legible. */
 @media (max-width: 720px) {
   .list-head,

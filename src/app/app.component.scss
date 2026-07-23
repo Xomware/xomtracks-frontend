@@ -108,6 +108,18 @@
   }
 }
 
+/* Cyan-accented so "link your number" reads as a distinct, inviting action
+   against the neutral Sign out button. */
+.header-btn--link {
+  border-color: rgba(102, 238, 251, 0.35);
+  color: var(--xt-cyan);
+
+  &:hover {
+    background: var(--xt-cyan-soft);
+    border-color: var(--xt-cyan-600);
+  }
+}
+
 .app-main {
   display: block;
 }

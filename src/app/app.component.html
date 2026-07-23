@@ -25,6 +25,11 @@
         routerLinkActive="header-link--active"
         class="header-link"
       >Playlists</a>
+      <button
+        type="button"
+        class="header-btn header-btn--link"
+        (click)="openLinkModal()"
+      >Link number</button>
       <span class="account-email" [title]="user.email">{{ user.email }}</span>
       <button type="button" class="header-btn" (click)="signOut()">Sign out</button>
     </ng-container>
@@ -37,3 +42,8 @@
 <main class="app-main">
   <router-outlet></router-outlet>
 </main>
+
+<app-link-phone-modal
+  *ngIf="showLinkModal"
+  (closed)="closeLinkModal()"
+></app-link-phone-modal>
