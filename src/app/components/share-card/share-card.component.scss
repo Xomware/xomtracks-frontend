@@ -33,6 +33,72 @@
   &--unmatched {
     opacity: 0.92;
   }
+
+  /* Heard: subtly dim the cover so played tracks recede without hiding. */
+  &--heard .cover-img,
+  &--heard .cover-fallback {
+    opacity: 0.62;
+    filter: saturate(0.85);
+  }
+}
+
+/* ── Heard toggle (top-left of the cover) ───────────────────────── */
+.heard-toggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2; /* above the whole-card trigger (z-index 1) */
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 7px;
+  border-radius: var(--xt-radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--xt-transition), color var(--xt-transition),
+    border-color var(--xt-transition), background var(--xt-transition);
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+    opacity: 1;
+  }
+
+  &:hover {
+    color: var(--xt-cyan);
+    border-color: var(--xt-cyan-700);
+  }
+
+  /* Marked heard — cyan, and always visible (it's a live indicator). */
+  &--on {
+    opacity: 1;
+    color: #04262b;
+    background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
+    border-color: transparent;
+    box-shadow: 0 2px 10px var(--xt-cyan-glow);
+
+    &:hover {
+      color: #04262b;
+    }
+  }
+}
+
+/* Reveal the toggle on card hover/focus (kept visible when already heard). */
+.card:hover .heard-toggle,
+.card:focus-within .heard-toggle {
+  opacity: 1;
+}
+
+.heard-check {
+  font-size: 12px;
 }
 
 /* Transparent full-card button — the primary "open details" action. */

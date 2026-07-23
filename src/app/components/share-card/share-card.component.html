@@ -1,4 +1,8 @@
-<article class="card" [class.card--unmatched]="share.matchStatus === 'unmatched'">
+<article
+  class="card"
+  [class.card--unmatched]="share.matchStatus === 'unmatched'"
+  [class.card--heard]="heard"
+>
   <!-- Whole-card trigger: a real button (native keyboard support) laid over
        the card via ::after. Sits under the "Open" link so that link stays
        independently clickable. -->
@@ -34,6 +38,19 @@
       *ngIf="showCount"
       [attr.aria-label]="'shared ' + shareCount + ' times'"
     >×{{ shareCount }}</span>
+
+    <!-- Heard toggle — sits above the whole-card trigger so it stays clickable. -->
+    <button
+      type="button"
+      class="heard-toggle"
+      [class.heard-toggle--on]="heard"
+      [attr.aria-pressed]="heard"
+      [attr.aria-label]="(heard ? 'Mark unheard: ' : 'Mark heard: ') + title"
+      (click)="toggleHeard.emit()"
+    >
+      <span class="heard-check" aria-hidden="true">{{ heard ? '✓' : '○' }}</span>
+      <span class="heard-text">{{ heard ? 'Heard' : 'Heard?' }}</span>
+    </button>
   </div>
 
   <div class="body">

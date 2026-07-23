@@ -4,9 +4,11 @@ import { Subscription } from 'rxjs';
 import { SharesService } from '../../services/shares.service';
 import { MeService } from '../../services/me.service';
 import { RatingsService } from '../../services/ratings.service';
+import { HeardService } from '../../services/heard.service';
 import {
   Direction,
   Platform,
+  RatedTrack,
   Rating,
   Share,
   TIME_WINDOWS,
@@ -77,6 +79,9 @@ export class FeedComponent implements OnInit, OnDestroy {
   /** Selected genre filter, or null for "all genres". */
   genre: string | null = null;
 
+  /** When on, hides tracks the caller has already marked heard. */
+  unheardOnly = false;
+
   /** The share whose detail modal is open, or null when closed. */
   selected: Share | null = null;
 
@@ -100,6 +105,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     private sharesService: SharesService,
     private meService: MeService,
     private ratingsService: RatingsService,
+    private heardService: HeardService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}
@@ -153,6 +159,17 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.load();
   }
 
+  /** The time-window control is meaningless for "My rated" (that source loads
+   * ALL rated tracks across directions), so it's hidden in that mode. */
+  get showWindow(): boolean {
+    return this.mode !== 'rated';
+  }
+
+  toggleUnheard(): void {
+    this.unheardOnly = !this.unheardOnly;
+    this.dataVersion++; // re-run the grouping/filter memo
+  }
+
   setView(view: FeedView): void {
     if (this.view === view) return;
     this.view = view;
@@ -196,9 +213,26 @@ export class FeedComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // "My rated" filters the primary browse feed (shared-with-me) down to the
-    // tracks the caller has rated; every other mode maps 1:1 to a direction.
-    const direction: Direction = this.mode === 'rated' ? 'in' : this.mode;
+    // "My rated" loads EVERY track the caller has rated, across BOTH directions,
+    // from the dedicated `/ratings/list` endpoint (not a filter over one
+    // direction). The rated rows are mapped into Share shape so the same grid,
+    // grouping, ratings, and heard controls render them unchanged.
+    if (this.mode === 'rated') {
+      this.sub = this.ratingsService.list().subscribe({
+        next: (res) => {
+          this.setShares((res.rated ?? []).map((r) => this.ratedToShare(r)));
+          this.state = 'loaded';
+        },
+        error: () => {
+          this.setShares([]);
+          this.state = 'error';
+        },
+      });
+      return;
+    }
+
+    // Every other mode maps 1:1 to a share direction.
+    const direction: Direction = this.mode;
     this.sub = this.sharesService.list(direction, this.window).subscribe({
       next: (res) => {
         this.setShares(res.shares ?? []);
@@ -209,6 +243,46 @@ export class FeedComponent implements OnInit, OnDestroy {
         this.state = 'error';
       },
     });
+  }
+
+  /** Map a `/ratings/list` row into a `Share` so the feed renders it with the
+   * existing grid/grouping. The reconstructed identity fields keep
+   * `trackKey(share)` equal to the row's `trackKey`. */
+  private ratedToShare(r: RatedTrack): Share {
+    const spId = r.trackKey.startsWith('sp:') ? r.trackKey.slice(3) : null;
+    const url = r.trackKey.startsWith('url:') ? `https://${r.trackKey.slice(4)}` : '';
+    const when = this.toEpochSeconds(r.date) ?? this.toEpochSeconds(r.ratedAt) ?? 0;
+    return {
+      shareId: `rated:${r.trackKey}`,
+      messageGuid: `rated:${r.trackKey}`,
+      direction: r.direction,
+      platform: r.platform,
+      sourceUrl: url,
+      messageDate: when,
+      sharerHandle: null,
+      sharerName: null,
+      chatId: null,
+      trackTitle: r.trackTitle ?? null,
+      trackArtist: r.trackArtist ?? null,
+      albumName: r.albumName ?? null,
+      albumArtUrl: r.albumArtUrl ?? null,
+      resolvedSpotifyId: spId,
+      resolvedSpotifyUri: null,
+      matchStatus: spId ? 'matched' : 'unmatched',
+      matchConfidence: null,
+      createdAt: '',
+      genres: null,
+      rating: { avg: r.rating, count: 1, myRating: r.rating },
+    };
+  }
+
+  /** Normalise a date field (epoch seconds, epoch millis, or ISO) to epoch
+   * seconds; null when unparseable. */
+  private toEpochSeconds(value: string | number | null | undefined): number | null {
+    if (value == null) return null;
+    if (typeof value === 'number') return value > 1e12 ? Math.floor(value / 1000) : value;
+    const ms = Date.parse(value);
+    return Number.isNaN(ms) ? null : Math.floor(ms / 1000);
   }
 
   private setShares(shares: Share[]): void {
@@ -271,8 +345,9 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   /** Non-filtered empty-state copy per feed mode. */
   get emptyText(): string {
+    if (this.unheardOnly) return "You've heard everything here — nice.";
     if (this.mode === 'mine') return 'None of your shares are in this window yet.';
-    if (this.mode === 'rated') return "You haven't rated any tracks in this window yet.";
+    if (this.mode === 'rated') return "You haven't rated any tracks yet.";
     if (this.mode === 'in') return 'No songs shared with you in this window.';
     return 'No songs you shared in this window.';
   }
@@ -338,6 +413,39 @@ export class FeedComponent implements OnInit, OnDestroy {
       error: () => {
         // Revert — a rating hiccup shouldn't strand the row.
         group.forEach((s, i) => (s.rating = before[i]));
+        this.dataVersion++;
+      },
+    });
+  }
+
+  // ── Heard / unheard ───────────────────────────────────────────────
+  /** The caller's heard state for a track group's representative share. */
+  heardFor(share: Share): boolean {
+    return !!share.heard;
+  }
+
+  /**
+   * Toggle the caller's "heard" state for a track. Flips every underlying share
+   * of the group optimistically (so the ×N breakdown and any other view of the
+   * same track reflect immediately), then persists via `/heard/set`. A failure
+   * reverts. Heard never throws into the browse UI.
+   */
+  onToggleHeard(share: Share): void {
+    const key = trackKey(share);
+    const group = this.allShares.filter((s) => trackKey(s) === key);
+    const before = group.map((s) => s.heard);
+    const next = !share.heard;
+
+    for (const s of group) s.heard = next;
+    this.dataVersion++;
+
+    this.heardService.set(key, next).subscribe({
+      next: (state) => {
+        for (const s of group) s.heard = state.heard;
+        this.dataVersion++;
+      },
+      error: () => {
+        group.forEach((s, i) => (s.heard = before[i]));
         this.dataVersion++;
       },
     });
@@ -469,7 +577,7 @@ export class FeedComponent implements OnInit, OnDestroy {
    */
   private computeGroups() {
     const q = this.search.trim().toLowerCase();
-    const cacheKey = `${this.dataVersion}|${q}|${this.genre ?? ''}|${this.mode}`;
+    const cacheKey = `${this.dataVersion}|${q}|${this.genre ?? ''}|${this.mode}|${this.unheardOnly}`;
     if (this.groupCache?.key === cacheKey) return this.groupCache;
 
     const byKey = new Map<string, Share[]>();
@@ -522,9 +630,15 @@ export class FeedComponent implements OnInit, OnDestroy {
         ),
       );
     }
-    // "My rated" — only tracks the caller has rated (myRating > 0).
+    // "My rated" — only tracks the caller has rated (myRating > 0). The rated
+    // source already returns only rated tracks, but this also guards the other
+    // sources if the mode is ever reused.
     if (this.mode === 'rated') {
       filteredReps = filteredReps.filter((rep) => (rep.rating?.myRating ?? 0) > 0);
+    }
+    // "Unheard" — hide tracks the caller has already marked heard.
+    if (this.unheardOnly) {
+      filteredReps = filteredReps.filter((rep) => !rep.heard);
     }
     filteredReps = [...filteredReps].sort((a, b) => (b.messageDate ?? 0) - (a.messageDate ?? 0));
 

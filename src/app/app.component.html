@@ -45,6 +45,16 @@
               Profile
             </a>
           </li>
+          <li role="none" *ngIf="isAdmin$ | async">
+            <a
+              routerLink="/admin"
+              role="menuitem"
+              class="account-item account-item--nav"
+              (click)="closeAccountMenu()"
+            >
+              Admin
+            </a>
+          </li>
           <li role="none">
             <button type="button" role="menuitem" class="account-item" (click)="signOut()">
               Sign out

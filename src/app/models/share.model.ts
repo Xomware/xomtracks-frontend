@@ -55,6 +55,40 @@ export interface Share {
   /** Whole-group rating aggregate + the caller's own rating. Optional until
    * the backend enriches `/shares/list`; the UI degrades gracefully. */
   rating?: Rating | null;
+
+  /** The CALLER's own "heard" state for this track, enriched onto each share
+   * by the backend (`/shares/list`). `true` once they've marked it played.
+   * Optional/undefined until the backend ships it — the UI treats absent as
+   * unheard. Toggled per-track via `POST /heard/set`. */
+  heard?: boolean;
+}
+
+/**
+ * One entry from `GET /ratings/list` — a track the caller has rated, in ANY
+ * direction. Unlike a `Share`, this is already flattened to the rated track
+ * (one row per `trackKey`), carrying just what the feed needs to render it.
+ */
+export interface RatedTrack {
+  /** The shared track-group key (utils/track-display.ts::trackKey). */
+  trackKey: string;
+  /** The caller's own rating, 1..5. */
+  rating: number;
+  /** When the caller last rated it (ISO or epoch — display-only). */
+  ratedAt: string | number;
+  trackTitle?: string | null;
+  trackArtist?: string | null;
+  albumArtUrl?: string | null;
+  albumName?: string | null;
+  platform: Platform;
+  /** Which direction the underlying share came from. */
+  direction: Direction;
+  /** The underlying share's date (epoch seconds or ISO). */
+  date?: string | number | null;
+}
+
+/** GET /ratings/list — every track the caller has rated, across directions. */
+export interface RatedListResponse {
+  rated: RatedTrack[];
 }
 
 export interface SharesListResponse {

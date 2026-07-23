@@ -1,0 +1,82 @@
+<section class="admin">
+  <header class="ad-hero">
+    <div class="ad-hero-body">
+      <p class="ad-eyebrow">Admin</p>
+      <h1 class="ad-title">Link requests</h1>
+      <p class="ad-sub" *ngIf="state === 'loaded'">
+        {{ requests.length }}
+        {{ requests.length === 1 ? 'request' : 'requests' }} pending approval
+      </p>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div class="ad-loading" *ngIf="state === 'loading'" aria-busy="true" aria-label="Loading link requests">
+    <div class="ad-skeleton" *ngFor="let s of [1, 2, 3]"></div>
+  </div>
+
+  <!-- Not authorized (403) -->
+  <div class="ad-state" *ngIf="state === 'forbidden'" role="alert">
+    <div class="ad-state-emoji" aria-hidden="true">🔒</div>
+    <h2 class="ad-state-title">Not authorized</h2>
+    <p class="ad-state-text">This area is for Xomtracks admins only.</p>
+    <a class="ad-btn" routerLink="/">Back to home</a>
+  </div>
+
+  <!-- Error -->
+  <div class="ad-state" *ngIf="state === 'error'" role="alert">
+    <div class="ad-state-emoji" aria-hidden="true">⚠️</div>
+    <h2 class="ad-state-title">Couldn't load requests</h2>
+    <p class="ad-state-text">Something went wrong reaching the Xomtracks API.</p>
+    <button type="button" class="ad-btn" (click)="retry()">Try again</button>
+  </div>
+
+  <!-- Loaded -->
+  <ng-container *ngIf="state === 'loaded'">
+    <p class="ad-action-error" *ngIf="actionError" role="alert">{{ actionError }}</p>
+
+    <ul class="ad-list" *ngIf="requests.length; else noRequests">
+      <li class="ad-row" *ngFor="let req of requests; trackBy: trackByRequest">
+        <span class="ad-avatar" aria-hidden="true">{{ displayName(req)[0] || '?' }}</span>
+        <div class="ad-row-body">
+          <p class="ad-row-name">{{ displayName(req) }}</p>
+          <p class="ad-row-meta">
+            <span class="ad-row-phone">{{ req.phone }}</span>
+            <span class="ad-dot" aria-hidden="true">·</span>
+            <span class="ad-row-email" [title]="req.requesterEmail">{{ req.requesterEmail }}</span>
+            <ng-container *ngIf="createdLabel(req) as when">
+              <span class="ad-dot" aria-hidden="true">·</span>
+              <span class="ad-row-date">{{ when }}</span>
+            </ng-container>
+          </p>
+        </div>
+        <div class="ad-row-actions">
+          <button
+            type="button"
+            class="ad-act ad-act--deny"
+            [disabled]="isPending(req)"
+            (click)="deny(req)"
+          >
+            Deny
+          </button>
+          <button
+            type="button"
+            class="ad-act ad-act--approve"
+            [disabled]="isPending(req)"
+            (click)="approve(req)"
+          >
+            Approve
+          </button>
+        </div>
+      </li>
+    </ul>
+
+    <ng-template #noRequests>
+      <div class="ad-state ad-state--empty">
+        <div class="ad-state-emoji" aria-hidden="true">✅</div>
+        <h2 class="ad-state-title">All caught up</h2>
+        <p class="ad-state-text">No pending link requests right now.</p>
+      </div>
+    </ng-template>
+  </ng-container>
+</section>

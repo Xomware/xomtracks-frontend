@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { LinkPhoneResult, MeInfo, MySharesResponse } from '../models/me.model';
+import { LinkRequestResult, MeInfo, MySharesResponse } from '../models/me.model';
 import { TimeWindow } from '../models/share.model';
 
 /**
@@ -40,10 +40,11 @@ export class MeService {
       .pipe(map((res) => res.data));
   }
 
-  /** POST /me/link-phone — link a phone number to the caller's identity. */
-  linkPhone(phoneNumber: string): Observable<LinkPhoneResult> {
+  /** POST /me/link-phone — SUBMIT a link request (admin-approval model).
+   * Returns `{ status: 'pending', requestId }`; an admin approves it later. */
+  linkPhone(phoneNumber: string): Observable<LinkRequestResult> {
     return this.http
-      .post<ApiEnvelope<LinkPhoneResult>>(`${this.baseUrl}/link-phone`, { phoneNumber })
+      .post<ApiEnvelope<LinkRequestResult>>(`${this.baseUrl}/link-phone`, { phoneNumber })
       .pipe(map((res) => res.data));
   }
 

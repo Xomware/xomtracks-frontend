@@ -208,6 +208,51 @@
   box-shadow: 0 4px 14px var(--xt-cyan-glow);
 }
 
+/* ── Unheard filter toggle ──────────────────────────────────────── */
+.unheard-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border-radius: var(--xt-radius-pill);
+  border: 1px solid var(--xt-border);
+  background: var(--xt-surface);
+  color: var(--xt-text-muted);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--xt-transition);
+
+  &:hover {
+    color: var(--xt-text);
+    border-color: var(--xt-border-strong);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+
+  &--on {
+    color: #04262b;
+    background: linear-gradient(135deg, var(--xt-cyan-600) 0%, var(--xt-cyan-700) 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 14px var(--xt-cyan-glow);
+
+    .unheard-dot {
+      background: #04262b;
+    }
+  }
+}
+
+.unheard-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--xt-cyan);
+}
+
 /* ── View toggle ────────────────────────────────────────────────── */
 .segmented--view .view-btn {
   display: inline-flex;
@@ -292,6 +337,49 @@ $list-cols: 44px minmax(0, 1fr) 116px 140px 148px;
 
   &--unmatched {
     opacity: 0.9;
+  }
+
+  /* Heard: dim the row's cover so played tracks read as "done". */
+  &--heard .row-thumb {
+    opacity: 0.55;
+  }
+}
+
+/* Row heard toggle — interactive, so above the row-trigger overlay. */
+.heard-toggle--row {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--xt-radius-pill);
+  border: 1px solid var(--xt-border-strong);
+  background: var(--xt-surface-3);
+  color: var(--xt-text-faint);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--xt-transition);
+
+  &:hover {
+    color: var(--xt-cyan);
+    border-color: var(--xt-cyan-700);
+    background: var(--xt-surface-2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+
+  &.heard-toggle--on {
+    color: #04262b;
+    background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
+    border-color: transparent;
+    box-shadow: 0 2px 8px var(--xt-cyan-glow);
   }
 }
 
@@ -683,5 +771,10 @@ $list-cols: 44px minmax(0, 1fr) 116px 140px 148px;
 
   .row-open {
     padding: 4px 8px;
+  }
+
+  /* Compact the heard toggle to just its check glyph on phones. */
+  .heard-toggle--row .heard-text {
+    display: none;
   }
 }
