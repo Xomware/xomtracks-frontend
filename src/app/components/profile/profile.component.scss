@@ -134,6 +134,32 @@
   font-size: 0.86rem;
 }
 
+/* Linked confirmation — approved; reuses the pending layout with a red badge. */
+.pf-linked {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--xt-radius);
+  background: var(--xt-danger-bg);
+  border: 1px solid rgba(255, 55, 80, 0.32);
+}
+
+.pf-linked-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  box-shadow: 0 0 16px var(--xt-red-glow);
+}
+
 /* Entry form */
 .pf-link-form {
   margin: 0;

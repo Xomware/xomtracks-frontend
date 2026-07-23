@@ -42,12 +42,27 @@
         reviews each request. Mainly useful for members other than the group owner.
       </p>
 
-      <!-- SUBMITTED: pending-approval acknowledgement. -->
-      <div class="pf-pending" *ngIf="linkRequested; else linkForm" role="status">
+      <!-- LINKED: approved — show the attributed share count. -->
+      <div class="pf-linked" *ngIf="showLinkLinked" role="status">
+        <span class="pf-linked-badge" aria-hidden="true">✓</span>
+        <div class="pf-pending-body">
+          <p class="pf-pending-title">Linked</p>
+          <p class="pf-pending-text">
+            {{ linkedShareCount }}
+            {{ linkedShareCount === 1 ? 'of your shares is' : 'of your shares are' }}
+            attributed to you — find them under <strong>Mine</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- PENDING: request is in, awaiting an admin. -->
+      <div class="pf-pending" *ngIf="showLinkPending" role="status">
         <span class="pf-pending-badge" aria-hidden="true">⧗</span>
         <div class="pf-pending-body">
           <p class="pf-pending-title">
-            Request submitted<ng-container *ngIf="requestedNumber"> · {{ requestedNumber }}</ng-container>
+            {{ justSubmitted ? 'Request submitted' : 'Request pending approval' }}<ng-container
+              *ngIf="justSubmitted && requestedNumber"
+            > · {{ requestedNumber }}</ng-container>
           </p>
           <p class="pf-pending-text">
             Pending approval — an admin will review it shortly. Once approved,
@@ -56,31 +71,31 @@
         </div>
       </div>
 
-      <!-- ENTRY: request the link. -->
-      <ng-template #linkForm>
-        <form class="pf-link-form" (ngSubmit)="submitLinkRequest()">
-          <label class="pf-field-label" for="pf-phone">Phone number</label>
-          <div class="pf-field-row">
-            <input
-              id="pf-phone"
-              class="pf-field-input"
-              type="tel"
-              inputmode="tel"
-              autocomplete="tel"
-              name="phone"
-              placeholder="(336) 404-2196"
-              [(ngModel)]="linkPhone"
-              aria-describedby="pf-phone-hint"
-            />
-            <button type="submit" class="pf-link-btn" [disabled]="!canSubmitLinkRequest">
-              Request link
-            </button>
-          </div>
-          <p id="pf-phone-hint" class="pf-field-hint">
-            US numbers. We match on the last 10 digits — formatting doesn't matter.
-          </p>
-        </form>
-      </ng-template>
+      <!-- ENTRY (linkStatus === 'none'): request the link. -->
+      <form class="pf-link-form" *ngIf="showLinkForm" (ngSubmit)="submitLinkRequest()">
+        <label class="pf-field-label" for="pf-phone">Phone number</label>
+        <div class="pf-field-row">
+          <input
+            id="pf-phone"
+            class="pf-field-input"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            name="phone"
+            placeholder="(336) 404-2196"
+            [(ngModel)]="linkPhone"
+            [disabled]="linkSubmitting"
+            aria-describedby="pf-phone-hint"
+          />
+          <button type="submit" class="pf-link-btn" [disabled]="!canSubmitLinkRequest">
+            {{ linkSubmitting ? 'Submitting…' : 'Request access' }}
+          </button>
+        </div>
+        <p id="pf-phone-hint" class="pf-field-hint">
+          US numbers. We match on the last 10 digits — formatting doesn't matter.
+        </p>
+        <p class="pf-link-error" *ngIf="linkError" role="alert">{{ linkError }}</p>
+      </form>
     </section>
 
     <!-- Totals -->

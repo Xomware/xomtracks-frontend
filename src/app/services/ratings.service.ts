@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Rating } from '../models/share.model';
+import { Rating, RatedListResponse } from '../models/share.model';
 
 /**
  * The org-wide `{ data, error, meta }` envelope every xomtracks-backend
@@ -36,6 +36,15 @@ export class RatingsService {
   set(trackKey: string, rating: number): Observable<Rating> {
     return this.http
       .post<ApiEnvelope<Rating>>(`${this.baseUrl}/set`, { trackKey, rating })
+      .pipe(map((res) => res.data));
+  }
+
+  /** GET /ratings/list — every track the caller has rated, ACROSS both share
+   * directions (the "My rated" feed source loads this instead of filtering a
+   * single direction). */
+  list(): Observable<RatedListResponse> {
+    return this.http
+      .get<ApiEnvelope<RatedListResponse>>(`${this.baseUrl}/list`)
       .pipe(map((res) => res.data));
   }
 }

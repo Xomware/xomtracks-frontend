@@ -5,6 +5,7 @@ import { CognitoService } from '../../services/cognito.service';
 import { MeService } from '../../services/me.service';
 import { SharesService } from '../../services/shares.service';
 import { Share } from '../../models/share.model';
+import { LinkStatus, MeInfo } from '../../models/me.model';
 import { displayTitle, trackKey } from '../../utils/track-display';
 
 type LoadState = 'loading' | 'loaded' | 'error';
@@ -32,11 +33,12 @@ export interface RatedTrack {
  * sharers, top genres, and their highest-rated tracks. Everything degrades: a
  * failing endpoint yields an empty slice rather than blanking the page.
  *
- * This is also where a member REQUESTS to link their phone number. Linking is
- * moving to an admin-approval model, so this is a request only — enter a number,
- * submit, and get a "pending approval" acknowledgement. The request-status model
- * (none / pending / linked) and the admin approve/deny portal land in a
- * follow-up against the new backend; we deliberately don't guess those shapes.
+ * This is also where a member REQUESTS to link their phone number, under the
+ * admin-approval model. `GET /me/get` returns a `linkStatus` (none / pending /
+ * linked) that drives this section: `none` shows the phone-entry form (which
+ * POSTs `/me/link-phone` for an admin to approve), `pending` shows a
+ * pending-approval notice, and `linked` confirms the link with the caller's
+ * attributed share count. An admin acts on the request in the `/admin` portal.
  */
 @Component({
   selector: 'app-profile',
@@ -57,11 +59,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
   topGenres: CountStat[] = [];
   topRated: RatedTrack[] = [];
 
-  // ── Link-your-number request ─────────────────────────────────────
+  // ── Link-your-number request (admin-approval model) ──────────────
   linkPhone = '';
-  /** True once the caller submits a link request this session — flips the card
-   * to the pending acknowledgement. */
-  linkRequested = false;
+  /** Server-reported link state, from `GET /me/get`. Drives which link view
+   * shows: form (none) / pending notice / linked confirmation. */
+  linkStatus: LinkStatus = 'none';
+  /** Attributed share count, shown in the `linked` state. */
+  linkedShareCount = 0;
+  /** True while the `/me/link-phone` POST is in flight. */
+  linkSubmitting = false;
+  /** True right after a successful submit this session — swaps the copy to the
+   * "Request submitted" acknowledgement (vs the persistent "pending"). */
+  justSubmitted = false;
+  /** Non-empty when the submit failed — shown inline under the form. */
+  linkError = '';
 
   private sub?: Subscription;
 
@@ -96,7 +107,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   /** US numbers match on the last 10 digits — enable submit once we have them. */
   get canSubmitLinkRequest(): boolean {
-    return this.linkDigitCount >= 10 && !this.linkRequested;
+    return this.linkDigitCount >= 10 && !this.linkSubmitting && this.linkStatus === 'none';
+  }
+
+  /** Show the phone-entry form (no request in flight and not yet requested). */
+  get showLinkForm(): boolean {
+    return this.linkStatus === 'none' && !this.justSubmitted;
+  }
+
+  /** Show the pending-approval notice (server said pending, or we just sent). */
+  get showLinkPending(): boolean {
+    return this.linkStatus === 'pending' || this.justSubmitted;
+  }
+
+  /** Show the linked confirmation. */
+  get showLinkLinked(): boolean {
+    return this.linkStatus === 'linked';
   }
 
   /** The requested number, lightly formatted for the acknowledgement. */
@@ -110,17 +136,35 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   submitLinkRequest(): void {
     if (!this.canSubmitLinkRequest) return;
-    // Request only: trust-based auto-linking is being replaced by admin approval.
-    // The POST to the forthcoming request endpoint gets wired in a follow-up once
-    // the backend shape exists — deliberately not guessed here.
-    this.linkRequested = true;
+    this.linkSubmitting = true;
+    this.linkError = '';
+    this.meService.linkPhone(this.linkPhone).subscribe({
+      next: () => {
+        this.linkSubmitting = false;
+        this.justSubmitted = true;
+        this.linkStatus = 'pending';
+      },
+      error: () => {
+        this.linkSubmitting = false;
+        this.linkError = "Couldn't submit your request. Please try again.";
+      },
+    });
   }
 
   load(): void {
     this.state = 'loading';
     this.sub?.unsubscribe();
 
+    const emptyMe: MeInfo = {
+      email: this.email,
+      linkStatus: 'none',
+      linked: false,
+      linkedHandles: [],
+      shareCount: 0,
+    };
+
     this.sub = forkJoin({
+      me: this.meService.get().pipe(catchError(() => of(emptyMe))),
       inShares: this.sharesService
         .list('in', 'all')
         .pipe(catchError(() => of({ shares: [] as Share[] }))),
@@ -131,7 +175,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
         .myShares('all')
         .pipe(catchError(() => of({ shares: [] as Share[] }))),
     }).subscribe({
-      next: ({ inShares, outShares, mine }) => {
+      next: ({ me, inShares, outShares, mine }) => {
+        this.applyMe(me);
         this.computeStats(inShares.shares ?? [], outShares.shares ?? [], mine.shares ?? []);
         this.state = 'loaded';
       },
@@ -139,6 +184,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.state = 'error';
       },
     });
+  }
+
+  /** Fold the `/me/get` result into the link section (unless we just submitted
+   * this session — keep the local "pending" acknowledgement in that case). */
+  private applyMe(me: MeInfo): void {
+    if (me.email) this.email = me.email;
+    this.linkedShareCount = me.shareCount ?? 0;
+    if (!this.justSubmitted) {
+      this.linkStatus = me.linkStatus ?? 'none';
+    }
   }
 
   trackByLabel(_index: number, stat: CountStat): string {

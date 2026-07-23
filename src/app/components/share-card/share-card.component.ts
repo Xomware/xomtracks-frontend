@@ -32,11 +32,17 @@ export class ShareCardComponent {
   /** The track group's key, for the whole-group rating control. */
   @Input() trackKey = '';
 
+  /** The caller's "heard" state for this track (drives the toggle + dim). */
+  @Input() heard = false;
+
   /** Emitted when the card's trigger is activated so the feed opens the modal. */
   @Output() open = new EventEmitter<Share>();
 
   /** Emitted with a 1..5 value when the caller sets a rating from the card. */
   @Output() rate = new EventEmitter<number>();
+
+  /** Emitted when the caller toggles the heard state from the card. */
+  @Output() toggleHeard = new EventEmitter<void>();
 
   /** Toggled true when the <img> fails, so the template swaps to the
    * fallback cover without leaving a broken image. */

@@ -61,8 +61,9 @@
         </select>
       </label>
 
-      <!-- Time window (the sorting/range control) -->
-      <div class="segmented segmented--windows" role="group" aria-label="Time window">
+      <!-- Time window (the sorting/range control) — hidden for "My rated",
+           which loads ALL rated tracks regardless of window. -->
+      <div class="segmented segmented--windows" role="group" aria-label="Time window" *ngIf="showWindow">
         <button
           *ngFor="let w of windows"
           type="button"
@@ -74,6 +75,18 @@
           {{ w.label }}
         </button>
       </div>
+
+      <!-- Unheard filter: show only tracks the caller hasn't marked heard. -->
+      <button
+        type="button"
+        class="unheard-toggle"
+        [class.unheard-toggle--on]="unheardOnly"
+        [attr.aria-pressed]="unheardOnly"
+        (click)="toggleUnheard()"
+      >
+        <span class="unheard-dot" aria-hidden="true"></span>
+        Unheard
+      </button>
     </div>
 
     <!-- View toggle: tile grid / dense list -->
@@ -141,8 +154,10 @@
           [shareCount]="groupCount(share)"
           [sharerSummary]="sharerSummaryFor(share)"
           [trackKey]="keyFor(share)"
+          [heard]="heardFor(share)"
           (open)="openDetail($event)"
           (rate)="onRate(share, $event)"
+          (toggleHeard)="onToggleHeard(share)"
         ></app-share-card>
       </div>
 
@@ -159,6 +174,7 @@
           class="row"
           *ngFor="let share of groupedShares; trackBy: trackByShareId"
           [class.row--unmatched]="share.matchStatus === 'unmatched'"
+          [class.row--heard]="heardFor(share)"
         >
           <!-- Transparent overlay button = open details; sits under the
                trailing "open" link so that link stays clickable. -->
@@ -210,6 +226,17 @@
             <span class="row-sharer-name">{{ rowSharerLabel(share) }}</span>
           </span>
           <span class="col-actions">
+            <button
+              type="button"
+              class="heard-toggle heard-toggle--row"
+              [class.heard-toggle--on]="heardFor(share)"
+              [attr.aria-pressed]="heardFor(share)"
+              [attr.aria-label]="(heardFor(share) ? 'Mark unheard: ' : 'Mark heard: ') + rowTitle(share)"
+              (click)="onToggleHeard(share)"
+            >
+              <span class="heard-check" aria-hidden="true">{{ heardFor(share) ? '✓' : '○' }}</span>
+              <span class="heard-text">{{ heardFor(share) ? 'Heard' : 'Heard?' }}</span>
+            </button>
             <span class="col-date">{{ relativeDate(share) }}</span>
             <a
               *ngIf="showOpenLink(share)"

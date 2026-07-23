@@ -6,23 +6,32 @@
 
 import { Share, TimeWindow } from './share.model';
 
-/** GET /me — the caller's link status. */
+/**
+ * Where the caller sits in the admin-approval link flow:
+ *   none    — no request yet; show the phone-entry form.
+ *   pending — a request is in, awaiting an admin.
+ *   linked  — approved; their shares are attributed to them.
+ */
+export type LinkStatus = 'none' | 'pending' | 'linked';
+
+/** GET /me/get — the caller's link status + attributed share count. */
 export interface MeInfo {
   email: string;
+  /** The admin-approval link state — drives the Profile link section. */
+  linkStatus: LinkStatus;
+  /** Convenience mirror of `linkStatus === 'linked'`. */
   linked: boolean;
   linkedHandles: string[];
+  /** How many shares are attributed to the caller (shown once linked). */
   shareCount: number;
 }
 
-/** POST /me/link-phone — result of a link attempt (trust-based). */
-export interface LinkPhoneResult {
-  /** The normalized last-10-digit handle that was linked. */
-  handle: string;
-  linkedHandles: string[];
-  /** How many existing shares already carry this handle. */
-  matchedShareCount: number;
-  /** True when matchedShareCount === 0 (linked, but nothing found yet). */
-  flagged: boolean;
+/** POST /me/link-phone — acknowledgement of a link REQUEST (admin approves). */
+export interface LinkRequestResult {
+  /** Always 'pending' on a fresh request — approval happens in the portal. */
+  status: 'pending';
+  /** The created request's id (echoed by the admin portal). */
+  requestId: string;
 }
 
 /** GET /me/shares — the caller's own shares (the "Mine" feed). */
