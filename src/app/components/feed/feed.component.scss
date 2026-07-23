@@ -103,6 +103,15 @@
   margin-bottom: 24px;
 }
 
+/* Direction + time-window tabs travel together on the left; the view toggle
+   is the .controls flex sibling that stays pushed to the far right. */
+.controls-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .segmented {
   display: inline-flex;
   padding: 4px;
@@ -169,6 +178,10 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  /* Equal-height rows: every tile in a row shares the tallest tile's height,
+     so an unmatched card (chip + "Open on Spotify") never makes the row ragged.
+     Cards stretch to fill via `.card { height: 100% }` (share-card.scss). */
+  grid-auto-rows: 1fr;
   gap: 18px;
 }
 
@@ -281,12 +294,39 @@ $list-cols: 44px minmax(0, 1fr) 116px 140px 148px;
   line-height: 1.25;
 }
 
+.row-title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .row-title {
   font-size: 0.9rem;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ×N group badge — cyan, on-brand. Inline variant sits beside a list title. */
+.count-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: var(--xt-radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #04262b;
+  background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
+  box-shadow: 0 1px 6px var(--xt-cyan-glow);
+}
+
+.count-badge--inline {
+  font-size: 10.5px;
+  padding: 1px 6px;
 }
 
 .row-artist {
@@ -513,6 +553,29 @@ $list-cols: 44px minmax(0, 1fr) 116px 140px 148px;
 
 .state-block--error {
   border-color: var(--xt-danger-border);
+}
+
+/* The "link your number" prompt on an unlinked Mine tab — cyan-accented,
+   solid (not dashed) so it reads as an invitation rather than an empty slot. */
+.state-block--link {
+  border-style: solid;
+  border-color: rgba(102, 238, 251, 0.28);
+  background: linear-gradient(180deg, var(--xt-cyan-soft) 0%, var(--xt-bg-2) 60%);
+}
+
+.state-btn--primary {
+  background: var(--xt-primary);
+  border-color: var(--xt-primary);
+  color: var(--xt-on-primary);
+
+  &:hover {
+    background: var(--xt-primary-hover);
+    border-color: var(--xt-primary-hover);
+  }
+
+  &:active {
+    background: var(--xt-primary-active);
+  }
 }
 
 /* Tablet: drop the platform column so rows stay legible. */

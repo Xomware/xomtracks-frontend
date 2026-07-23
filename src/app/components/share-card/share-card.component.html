@@ -28,6 +28,12 @@
     <span class="platform-badge" [attr.data-platform]="share.platform">
       {{ platformLabel }}
     </span>
+
+    <span
+      class="count-badge"
+      *ngIf="showCount"
+      [attr.aria-label]="'shared ' + shareCount + ' times'"
+    >×{{ shareCount }}</span>
   </div>
 
   <div class="body">
@@ -44,7 +50,7 @@
     <div class="meta">
       <span class="sharer">
         <span class="sharer-avatar" aria-hidden="true">{{ sharerInitial }}</span>
-        <span class="sharer-name">{{ sharer }}</span>
+        <span class="sharer-name">{{ sharerDisplay }}</span>
       </span>
       <span class="dot-sep" aria-hidden="true">·</span>
       <span class="date">{{ dateLabel }}</span>

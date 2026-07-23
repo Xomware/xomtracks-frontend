@@ -2,6 +2,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  /* Fill the equal-height grid row (feed .grid uses grid-auto-rows: 1fr) so
+     every tile in a row is the same height regardless of match state. */
+  height: 100%;
   background: var(--xt-surface);
   border: 1px solid var(--xt-border);
   border-radius: var(--xt-radius-lg);
@@ -112,6 +115,22 @@
   &[data-platform='apple'] {
     color: #ff6ec7;
   }
+}
+
+/* ×N group badge — top-right corner of the cover, cyan, on-brand. */
+.count-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 2px 9px;
+  border-radius: var(--xt-radius-pill);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #04262b;
+  background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
+  box-shadow: 0 2px 10px var(--xt-cyan-glow);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .body {

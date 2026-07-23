@@ -22,6 +22,13 @@ import {
 export class ShareCardComponent {
   @Input({ required: true }) share!: Share;
 
+  /** Number of underlying shares of this track (for the ×N badge). 1 = no badge. */
+  @Input() shareCount = 1;
+
+  /** Grouped sharer summary ("Tori, Jack +1") for shared-with-me; when set it
+   * replaces the single-sharer name. Empty falls back to the one sharer. */
+  @Input() sharerSummary = '';
+
   /** Emitted when the card's trigger is activated so the feed opens the modal. */
   @Output() open = new EventEmitter<Share>();
 
@@ -70,8 +77,18 @@ export class ShareCardComponent {
     return name || handle || 'Unknown';
   }
 
+  /** Displayed sharer: the grouped summary when present, else the one sharer. */
+  get sharerDisplay(): string {
+    return this.sharerSummary.trim() || this.sharer;
+  }
+
   get sharerInitial(): string {
-    return (this.sharer[0] ?? '?').toUpperCase();
+    return (this.sharerDisplay[0] ?? '?').toUpperCase();
+  }
+
+  /** Show the ×N badge only when the track was shared more than once. */
+  get showCount(): boolean {
+    return this.shareCount > 1;
   }
 
   get statusChip(): { label: string; kind: string } | null {

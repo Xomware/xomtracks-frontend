@@ -2,9 +2,9 @@
   <div class="feed-head">
     <div class="feed-titles">
       <h1 class="feed-title">The feed</h1>
-      <p class="feed-sub" *ngIf="state === 'loaded'">
-        {{ shares.length }}
-        {{ shares.length === 1 ? 'share' : 'shares' }}<ng-container
+      <p class="feed-sub" *ngIf="state === 'loaded' && !mineUnlinked">
+        {{ groupedShares.length }}
+        {{ groupedShares.length === 1 ? 'track' : 'tracks' }}<ng-container
           *ngIf="isFiltered"
         > matching “{{ search.trim() }}”</ng-container>
         <ng-container *ngIf="!isFiltered && matchedCount">
@@ -32,18 +32,30 @@
   </div>
 
   <div class="controls">
-    <!-- Direction: shared with me / by me -->
-    <div class="segmented" role="tablist" aria-label="Direction">
+    <!-- Left cluster: feed source + time window grouped together. -->
+    <div class="controls-left">
+    <!-- Feed source: shared with me / by me / mine -->
+    <div class="segmented" role="tablist" aria-label="Feed">
       <button
         *ngFor="let d of directions"
         type="button"
         role="tab"
         class="segmented-btn"
-        [class.segmented-btn--active]="direction === d.value"
-        [attr.aria-selected]="direction === d.value"
-        (click)="setDirection(d.value)"
+        [class.segmented-btn--active]="mode === d.value"
+        [attr.aria-selected]="mode === d.value"
+        (click)="setMode(d.value)"
       >
         {{ d.label }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="segmented-btn"
+        [class.segmented-btn--active]="mode === 'mine'"
+        [attr.aria-selected]="mode === 'mine'"
+        (click)="setMode('mine')"
+      >
+        Mine
       </button>
     </div>
 
@@ -60,8 +72,9 @@
         {{ w.label }}
       </button>
     </div>
+    </div>
 
-    <!-- View toggle: tile grid / dense list -->
+    <!-- View toggle: tile grid / dense list (stays far right) -->
     <div class="segmented segmented--view" role="group" aria-label="Layout">
       <button
         type="button"
@@ -103,12 +116,28 @@
 
   <!-- Loaded -->
   <ng-container *ngIf="state === 'loaded'">
-    <ng-container *ngIf="shares.length; else empty">
+    <!-- Mine tab, but no number linked yet -->
+    <div class="state-block state-block--link" *ngIf="mineUnlinked">
+      <div class="state-emoji" aria-hidden="true">🔗</div>
+      <h2 class="state-title">See the songs you shared</h2>
+      <p class="state-text">
+        Link the phone number you text from and Xomtracks will show the tracks
+        you dropped into the group — attributed to you.
+      </p>
+      <button type="button" class="state-btn state-btn--primary" (click)="openLink()">
+        Link your number
+      </button>
+    </div>
+
+    <ng-container *ngIf="!mineUnlinked">
+    <ng-container *ngIf="groupedShares.length; else empty">
       <!-- TILE view -->
       <div class="grid" *ngIf="view === 'tile'">
         <app-share-card
-          *ngFor="let share of shares; trackBy: trackByShareId"
+          *ngFor="let share of groupedShares; trackBy: trackByShareId"
           [share]="share"
+          [shareCount]="groupCount(share)"
+          [sharerSummary]="sharerSummaryFor(share)"
           (open)="openDetail($event)"
         ></app-share-card>
       </div>
@@ -124,7 +153,7 @@
         </div>
         <div
           class="row"
-          *ngFor="let share of shares; trackBy: trackByShareId"
+          *ngFor="let share of groupedShares; trackBy: trackByShareId"
           [class.row--unmatched]="share.matchStatus === 'unmatched'"
         >
           <!-- Transparent overlay button = open details; sits under the
@@ -150,7 +179,14 @@
             </ng-template>
           </span>
           <span class="col-track">
-            <span class="row-title">{{ rowTitle(share) }}</span>
+            <span class="row-title-line">
+              <span class="row-title">{{ rowTitle(share) }}</span>
+              <span
+                class="count-badge count-badge--inline"
+                *ngIf="groupCount(share) > 1"
+                [attr.aria-label]="'shared ' + groupCount(share) + ' times'"
+              >×{{ groupCount(share) }}</span>
+            </span>
             <span class="row-artist">{{ rowArtist(share) }}</span>
           </span>
           <span class="col-platform">
@@ -160,7 +196,7 @@
           </span>
           <span class="col-sharer">
             <span class="sharer-avatar" aria-hidden="true">{{ sharerInitial(share) }}</span>
-            <span class="row-sharer-name">{{ sharerLabel(share) }}</span>
+            <span class="row-sharer-name">{{ rowSharerLabel(share) }}</span>
           </span>
           <span class="col-actions">
             <span class="col-date">{{ relativeDate(share) }}</span>
@@ -191,8 +227,7 @@
           No shares match “{{ search.trim() }}” in this window.
         </p>
         <p class="state-text" *ngIf="!isFiltered">
-          No {{ direction === 'in' ? 'songs shared with you' : 'songs you shared' }}
-          in this window. Try a wider range.
+          {{ emptyText }} Try a wider range.
         </p>
         <button
           type="button"
@@ -202,6 +237,7 @@
         >Clear search</button>
       </div>
     </ng-template>
+    </ng-container>
   </ng-container>
 </section>
 
@@ -210,5 +246,6 @@
   [share]="share"
   [sharedTimes]="selectedSharedTimes"
   [otherSharers]="selectedOtherSharers"
+  [occurrences]="selectedOccurrences"
   (closed)="closeDetail()"
 ></app-track-detail-modal>

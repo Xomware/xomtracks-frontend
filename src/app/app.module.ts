@@ -11,6 +11,7 @@ import { FeedComponent } from './components/feed/feed.component';
 import { ShareCardComponent } from './components/share-card/share-card.component';
 import { TrackDetailModalComponent } from './components/track-detail-modal/track-detail-modal.component';
 import { PlaylistsComponent } from './components/playlists/playlists.component';
+import { LinkPhoneModalComponent } from './components/link-phone-modal/link-phone-modal.component';
 import { SignInComponent } from './components/auth/sign-in/sign-in.component';
 import { CallbackComponent } from './components/auth/callback/callback.component';
 
@@ -24,6 +25,7 @@ import { jwtInterceptor } from './interceptors/jwt.interceptor';
     ShareCardComponent,
     TrackDetailModalComponent,
     PlaylistsComponent,
+    LinkPhoneModalComponent,
     SignInComponent,
     CallbackComponent,
   ],

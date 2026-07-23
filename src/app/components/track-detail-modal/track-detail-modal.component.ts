@@ -44,6 +44,9 @@ export class TrackDetailModalComponent implements AfterViewInit {
   @Input() sharedTimes = 1;
   /** Distinct sharers of the same track other than this share's sharer. */
   @Input() otherSharers: string[] = [];
+  /** Every underlying share of this track (newest-first) for the full
+   * per-share breakdown. Its length equals the card's ×N. */
+  @Input() occurrences: Share[] = [];
 
   @Output() closed = new EventEmitter<void>();
 
@@ -213,5 +216,35 @@ export class TrackDetailModalComponent implements AfterViewInit {
     if (names.length === 1) return `Also shared by ${names[0]}`;
     if (names.length === 2) return `Also shared by ${names[0]} and ${names[1]}`;
     return `Also shared by ${names[0]}, ${names[1]} +${names.length - 2} more`;
+  }
+
+  /** Whether to show the per-share breakdown (track shared more than once). */
+  get showBreakdown(): boolean {
+    return this.occurrences.length > 1;
+  }
+
+  /** Sharer label for one underlying share in the breakdown. */
+  occurrenceSharer(occ: Share): string {
+    if (occ.direction === 'out') return 'You';
+    return occ.sharerName?.trim() || occ.sharerHandle?.trim() || 'Unknown';
+  }
+
+  occurrenceInitial(occ: Share): string {
+    return (this.occurrenceSharer(occ)[0] ?? '?').toUpperCase();
+  }
+
+  /** Full date for one underlying share in the breakdown. */
+  occurrenceDate(occ: Share): string {
+    const ms = (occ.messageDate ?? 0) * 1000;
+    if (!ms) return 'Unknown date';
+    return new Date(ms).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  trackByShareId(_index: number, occ: Share): string {
+    return occ.shareId;
   }
 }
