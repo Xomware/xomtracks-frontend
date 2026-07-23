@@ -52,6 +52,16 @@
           </span>
         </div>
 
+        <div class="rate-row">
+          <span class="rate-label">Rate this track</span>
+          <app-rating-stars
+            size="md"
+            [rating]="share.rating"
+            [trackKey]="trackKey"
+            (rate)="rate.emit($event)"
+          ></app-rating-stars>
+        </div>
+
         <a
           class="play-link"
           [href]="primaryUrl"

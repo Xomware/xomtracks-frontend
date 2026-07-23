@@ -9,6 +9,21 @@ export type TimeWindow = 'week' | 'month' | '6mo' | 'all';
 export type Platform = 'spotify' | 'soundcloud' | 'apple';
 export type MatchStatus = 'pending' | 'matched' | 'unmatched' | 'manual';
 
+/**
+ * Whole-group rating aggregate + the caller's own rating for a track.
+ * Enriched onto each share by `GET /shares/list` (backend extension in
+ * flight). Absent when the backend hasn't shipped it yet — the UI degrades
+ * to an empty, settable control in that case (see RatingStarsComponent).
+ */
+export interface Rating {
+  /** Mean of all ratings for the track group. 0 when no ratings yet. */
+  avg: number;
+  /** How many ratings the group has. 0 when unrated. */
+  count: number;
+  /** The caller's own rating (1..5). 0 when the caller hasn't rated. */
+  myRating: number;
+}
+
 export interface Share {
   shareId: string;
   messageGuid: string;
@@ -31,6 +46,14 @@ export interface Share {
   matchStatus: MatchStatus;
   matchConfidence?: number | null;
   createdAt: string;
+
+  /** Artist genre, when the backend genre-fetch has populated it. The genre
+   * filter reads this; while it's empty across the feed the control hides. */
+  genre?: string | null;
+
+  /** Whole-group rating aggregate + the caller's own rating. Optional until
+   * the backend enriches `/shares/list`; the UI degrades gracefully. */
+  rating?: Rating | null;
 }
 
 export interface SharesListResponse {

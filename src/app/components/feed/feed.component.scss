@@ -4,13 +4,65 @@
   padding: 28px clamp(16px, 4vw, 28px) 64px;
 }
 
+/* Inside the slide-out panel: tighter padding, full width. */
+.feed--embedded {
+  max-width: none;
+  padding: 18px 18px 40px;
+}
+
 .feed-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+}
+
+/* ── Light dropdown fields (source + genre) — replaced the big tabs ── */
+.lite-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.lite-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--xt-text-faint);
+}
+
+.lite-select {
+  appearance: none;
+  padding: 7px 30px 7px 12px;
+  border: 1px solid var(--xt-border);
+  border-radius: var(--xt-radius-pill);
+  background: var(--xt-surface)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23a6adbd' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E")
+    no-repeat right 11px center;
+  color: var(--xt-text);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--xt-transition), box-shadow var(--xt-transition);
+
+  &:hover {
+    border-color: var(--xt-border-strong);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--xt-cyan-700);
+    box-shadow: 0 0 0 3px var(--xt-cyan-soft);
+  }
+
+  option {
+    color: var(--xt-text);
+    background: var(--xt-surface);
+  }
 }
 
 .feed-title {
@@ -335,6 +387,13 @@ $list-cols: 44px minmax(0, 1fr) 116px 140px 148px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Row rating stars — interactive, so must sit above the row trigger overlay. */
+.row-rating {
+  position: relative;
+  z-index: 2;
+  margin-top: 3px;
 }
 
 .col-platform .platform-badge {

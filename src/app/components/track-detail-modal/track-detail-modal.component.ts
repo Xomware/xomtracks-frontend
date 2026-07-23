@@ -48,7 +48,13 @@ export class TrackDetailModalComponent implements AfterViewInit {
    * per-share breakdown. Its length equals the card's ×N. */
   @Input() occurrences: Share[] = [];
 
+  /** The track group's key, for the whole-group rating control. */
+  @Input() trackKey = '';
+
   @Output() closed = new EventEmitter<void>();
+
+  /** Emitted with a 1..5 value when the caller sets a rating in the modal. */
+  @Output() rate = new EventEmitter<number>();
 
   @ViewChild('dialog') dialogRef!: ElementRef<HTMLElement>;
 

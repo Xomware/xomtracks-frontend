@@ -29,8 +29,14 @@ export class ShareCardComponent {
    * replaces the single-sharer name. Empty falls back to the one sharer. */
   @Input() sharerSummary = '';
 
+  /** The track group's key, for the whole-group rating control. */
+  @Input() trackKey = '';
+
   /** Emitted when the card's trigger is activated so the feed opens the modal. */
   @Output() open = new EventEmitter<Share>();
+
+  /** Emitted with a 1..5 value when the caller sets a rating from the card. */
+  @Output() rate = new EventEmitter<number>();
 
   /** Toggled true when the <img> fails, so the template swaps to the
    * fallback cover without leaving a broken image. */

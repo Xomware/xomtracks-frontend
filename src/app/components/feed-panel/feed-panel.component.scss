@@ -1,0 +1,202 @@
+/* ── Sticky edge tab ─────────────────────────────────────────────── */
+.feed-tab {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  /* Rotate so the tab reads vertically, pinned flush to the right edge. */
+  transform: translateY(-50%) translateX(0);
+  transform-origin: center;
+  border: 1px solid var(--xt-border-strong);
+  border-right: 0;
+  border-radius: var(--xt-radius) 0 0 var(--xt-radius);
+  background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: -4px 0 18px rgba(0, 0, 0, 0.4), 0 0 18px var(--xt-red-glow);
+  transition: transform var(--xt-transition), box-shadow var(--xt-transition),
+    opacity var(--xt-transition);
+
+  &:hover {
+    transform: translateY(-50%) translateX(-2px);
+    box-shadow: -6px 0 22px rgba(0, 0, 0, 0.5), 0 0 22px var(--xt-red-glow);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 3px;
+  }
+
+  /* Slide off-screen while the panel is open (panel supersedes it). */
+  &--hidden {
+    transform: translateY(-50%) translateX(110%);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.feed-tab-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+/* ── Scrim + drawer ──────────────────────────────────────────────── */
+.feed-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(6, 7, 10, 0.62);
+  backdrop-filter: blur(2px);
+  animation: scrim-in 160ms ease-out;
+}
+
+.feed-drawer {
+  display: flex;
+  flex-direction: column;
+  width: min(480px, 92vw);
+  height: 100%;
+  background: var(--xt-bg);
+  border-left: 1px solid var(--xt-border-strong);
+  box-shadow: -18px 0 48px rgba(0, 0, 0, 0.55);
+  animation: drawer-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.feed-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--xt-border);
+  background: var(--xt-header-bg);
+}
+
+.feed-drawer-eyebrow {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--xt-cyan);
+}
+
+.feed-drawer-title {
+  margin: 2px 0 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.feed-drawer-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid var(--xt-border-strong);
+  border-radius: 50%;
+  background: var(--xt-surface);
+  color: var(--xt-text-muted);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--xt-transition), color var(--xt-transition),
+    border-color var(--xt-transition);
+
+  &:hover {
+    background: var(--xt-surface-2);
+    color: var(--xt-text);
+    border-color: var(--xt-cyan-700);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+}
+
+.feed-drawer-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+/* ── Mobile: bottom sheet instead of a side panel ────────────────── */
+@media (max-width: 640px) {
+  .feed-tab {
+    top: auto;
+    bottom: 20px;
+    right: 16px;
+    transform: none;
+    border-radius: var(--xt-radius-pill);
+    border-right: 1px solid var(--xt-border-strong);
+    padding: 12px 18px;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &--hidden {
+      transform: translateY(140%);
+    }
+  }
+
+  .feed-scrim {
+    align-items: flex-end;
+    justify-content: stretch;
+  }
+
+  .feed-drawer {
+    width: 100%;
+    height: 88vh;
+    max-height: 88vh;
+    border-left: 0;
+    border-top: 1px solid var(--xt-border-strong);
+    border-radius: var(--xt-radius-lg) var(--xt-radius-lg) 0 0;
+    box-shadow: 0 -18px 48px rgba(0, 0, 0, 0.55);
+    animation: sheet-in 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed-scrim,
+  .feed-drawer,
+  .feed-tab {
+    animation: none;
+    transition: none;
+  }
+}

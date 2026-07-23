@@ -1,16 +1,16 @@
-<section class="feed">
+<section class="feed" [class.feed--embedded]="embedded">
   <div class="feed-head">
-    <div class="feed-titles">
+    <div class="feed-titles" *ngIf="!embedded">
       <h1 class="feed-title">The feed</h1>
-      <p class="feed-sub" *ngIf="state === 'loaded' && !mineUnlinked">
-        {{ groupedShares.length }}
-        {{ groupedShares.length === 1 ? 'track' : 'tracks' }}<ng-container
-          *ngIf="isFiltered"
-        > matching “{{ search.trim() }}”</ng-container>
-        <ng-container *ngIf="!isFiltered && matchedCount">
-          · {{ matchedCount }} on Spotify</ng-container>
-      </p>
     </div>
+    <p class="feed-sub" *ngIf="state === 'loaded' && !mineUnlinked">
+      {{ groupedShares.length }}
+      {{ groupedShares.length === 1 ? 'track' : 'tracks' }}<ng-container
+        *ngIf="isFiltered"
+      > matching “{{ search.trim() }}”</ng-container>
+      <ng-container *ngIf="!isFiltered && matchedCount">
+        · {{ matchedCount }} on Spotify</ng-container>
+    </p>
 
     <label class="search">
       <span class="search-icon" aria-hidden="true">⌕</span>
@@ -32,49 +32,51 @@
   </div>
 
   <div class="controls">
-    <!-- Left cluster: feed source + time window grouped together. -->
     <div class="controls-left">
-    <!-- Feed source: shared with me / by me / mine -->
-    <div class="segmented" role="tablist" aria-label="Feed">
-      <button
-        *ngFor="let d of directions"
-        type="button"
-        role="tab"
-        class="segmented-btn"
-        [class.segmented-btn--active]="mode === d.value"
-        [attr.aria-selected]="mode === d.value"
-        (click)="setMode(d.value)"
-      >
-        {{ d.label }}
-      </button>
-      <button
-        type="button"
-        role="tab"
-        class="segmented-btn"
-        [class.segmented-btn--active]="mode === 'mine'"
-        [attr.aria-selected]="mode === 'mine'"
-        (click)="setMode('mine')"
-      >
-        Mine
-      </button>
+      <!-- Feed source: a light dropdown (replaced the big tabs). Includes the
+           "My rated" filter alongside the two directions + Mine. -->
+      <label class="lite-field">
+        <span class="lite-label">Source</span>
+        <select
+          class="lite-select"
+          [ngModel]="mode"
+          (ngModelChange)="setMode($event)"
+          aria-label="Feed source"
+        >
+          <option *ngFor="let s of sources" [ngValue]="s.value">{{ s.label }}</option>
+        </select>
+      </label>
+
+      <!-- Genre filter: hidden until the backend genre-fetch populates genres. -->
+      <label class="lite-field" *ngIf="genreEnabled">
+        <span class="lite-label">Genre</span>
+        <select
+          class="lite-select"
+          [ngModel]="genre"
+          (ngModelChange)="setGenre($event)"
+          aria-label="Filter by genre"
+        >
+          <option [ngValue]="null">All genres</option>
+          <option *ngFor="let g of genres" [ngValue]="g">{{ g }}</option>
+        </select>
+      </label>
+
+      <!-- Time window (the sorting/range control) -->
+      <div class="segmented segmented--windows" role="group" aria-label="Time window">
+        <button
+          *ngFor="let w of windows"
+          type="button"
+          class="segmented-btn"
+          [class.segmented-btn--active]="window === w.value"
+          [attr.aria-pressed]="window === w.value"
+          (click)="setWindow(w.value)"
+        >
+          {{ w.label }}
+        </button>
+      </div>
     </div>
 
-    <!-- Time window -->
-    <div class="segmented segmented--windows" role="group" aria-label="Time window">
-      <button
-        *ngFor="let w of windows"
-        type="button"
-        class="segmented-btn"
-        [class.segmented-btn--active]="window === w.value"
-        [attr.aria-pressed]="window === w.value"
-        (click)="setWindow(w.value)"
-      >
-        {{ w.label }}
-      </button>
-    </div>
-    </div>
-
-    <!-- View toggle: tile grid / dense list (stays far right) -->
+    <!-- View toggle: tile grid / dense list -->
     <div class="segmented segmented--view" role="group" aria-label="Layout">
       <button
         type="button"
@@ -138,7 +140,9 @@
           [share]="share"
           [shareCount]="groupCount(share)"
           [sharerSummary]="sharerSummaryFor(share)"
+          [trackKey]="keyFor(share)"
           (open)="openDetail($event)"
+          (rate)="onRate(share, $event)"
         ></app-share-card>
       </div>
 
@@ -188,6 +192,13 @@
               >×{{ groupCount(share) }}</span>
             </span>
             <span class="row-artist">{{ rowArtist(share) }}</span>
+            <app-rating-stars
+              class="row-rating"
+              [rating]="ratingFor(share)"
+              [trackKey]="keyFor(share)"
+              [showSummary]="false"
+              (rate)="onRate(share, $event)"
+            ></app-rating-stars>
           </span>
           <span class="col-platform">
             <span class="platform-badge" [attr.data-platform]="share.platform">
@@ -247,5 +258,7 @@
   [sharedTimes]="selectedSharedTimes"
   [otherSharers]="selectedOtherSharers"
   [occurrences]="selectedOccurrences"
+  [trackKey]="keyFor(share)"
+  (rate)="onRate(share, $event)"
   (closed)="closeDetail()"
 ></app-track-detail-modal>

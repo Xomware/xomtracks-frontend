@@ -1,0 +1,88 @@
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  color: var(--xt-surface-3);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--xt-transition), transform var(--xt-transition);
+
+  /* Empty star still reads on the dark canvas. */
+  &[data-state='off'] {
+    color: #3a3f4d;
+  }
+
+  /* Aggregate ghost fill — muted cyan, so it's clearly "others', not yours". */
+  &[data-state='avg'] {
+    color: var(--xt-cyan-700);
+  }
+
+  /* Your rating / hover preview — bright brand cyan. */
+  &[data-state='on'] {
+    color: var(--xt-cyan);
+    filter: drop-shadow(0 0 4px var(--xt-cyan-glow));
+  }
+
+  &:hover:not(:disabled) {
+    transform: scale(1.12);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 1px;
+    border-radius: 3px;
+  }
+}
+
+.rating--md .star {
+  font-size: 1.35rem;
+  padding: 3px;
+}
+
+.rating--disabled .star {
+  cursor: default;
+}
+
+.rating-summary {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 0.74rem;
+  color: var(--xt-text-muted);
+  white-space: nowrap;
+}
+
+.rating--md .rating-summary {
+  font-size: 0.85rem;
+}
+
+.rating-avg {
+  font-weight: 700;
+  color: var(--xt-text);
+}
+
+.rating-count {
+  color: var(--xt-text-faint);
+
+  &--empty {
+    font-weight: 600;
+    color: var(--xt-text-faint);
+  }
+}

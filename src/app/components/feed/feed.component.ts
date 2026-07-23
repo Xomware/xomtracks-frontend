@@ -1,12 +1,13 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SharesService } from '../../services/shares.service';
 import { MeService } from '../../services/me.service';
+import { RatingsService } from '../../services/ratings.service';
 import { LinkPhoneUiService } from '../../services/link-phone-ui.service';
 import {
-  DIRECTIONS,
   Direction,
   Platform,
+  Rating,
   Share,
   TIME_WINDOWS,
   TimeWindow,
@@ -16,12 +17,24 @@ import {
   isMatched,
   openLabel,
   primaryUrl,
+  trackKey,
 } from '../../utils/track-display';
 
 type LoadState = 'loading' | 'loaded' | 'error';
 export type FeedView = 'tile' | 'list';
-/** Feed source: the two share directions, plus "mine" (the caller's own). */
-export type FeedMode = Direction | 'mine';
+/**
+ * Feed source: the two share directions, "mine" (the caller's own), and
+ * "rated" (tracks the caller has rated — a filter over the browse feed).
+ */
+export type FeedMode = Direction | 'mine' | 'rated';
+
+/** Options for the lighter source control that replaced the big feed tabs. */
+export const FEED_SOURCES: ReadonlyArray<{ value: FeedMode; label: string }> = [
+  { value: 'in', label: 'Shared with me' },
+  { value: 'out', label: 'Shared by me' },
+  { value: 'mine', label: 'Mine' },
+  { value: 'rated', label: 'My rated' },
+];
 
 const VIEW_STORAGE_KEY = 'xt.feed.view';
 
@@ -45,13 +58,20 @@ const PLATFORM_LABELS: Record<Platform, string> = {
   styleUrls: ['./feed.component.scss'],
 })
 export class FeedComponent implements OnInit, OnDestroy {
-  readonly directions = DIRECTIONS;
   readonly windows = TIME_WINDOWS;
+  readonly sources = FEED_SOURCES;
+
+  /** When hosted inside the slide-out panel: drop the big page heading (the
+   * panel supplies its own) and tighten padding. */
+  @Input() embedded = false;
 
   mode: FeedMode = 'in';
   window: TimeWindow = 'month';
   search = '';
   view: FeedView = 'tile';
+
+  /** Selected genre filter, or null for "all genres". */
+  genre: string | null = null;
 
   /** The share whose detail modal is open, or null when closed. */
   selected: Share | null = null;
@@ -76,6 +96,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   constructor(
     private sharesService: SharesService,
     private meService: MeService,
+    private ratingsService: RatingsService,
     private linkUi: LinkPhoneUiService,
   ) {}
 
@@ -162,7 +183,10 @@ export class FeedComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.sub = this.sharesService.list(this.mode, this.window).subscribe({
+    // "My rated" filters the primary browse feed (shared-with-me) down to the
+    // tracks the caller has rated; every other mode maps 1:1 to a direction.
+    const direction: Direction = this.mode === 'rated' ? 'in' : this.mode;
+    this.sub = this.sharesService.list(direction, this.window).subscribe({
       next: (res) => {
         this.setShares(res.shares ?? []);
         this.state = 'loaded';
@@ -212,7 +236,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   /** Number of underlying shares for a track group (the ×N badge). Matches the
    * detail modal's "shared N times" exactly — both count occurrencesOf(). */
   groupCount(share: Share): number {
-    return this.computeGroups().countByKey.get(this.trackKey(share)) ?? 1;
+    return this.computeGroups().countByKey.get(trackKey(share)) ?? 1;
   }
 
   /** Summarised distinct sharers of a track group ("Tori, Jack +1"), for the
@@ -235,8 +259,85 @@ export class FeedComponent implements OnInit, OnDestroy {
   /** Non-filtered empty-state copy per feed mode. */
   get emptyText(): string {
     if (this.mode === 'mine') return 'None of your shares are in this window yet.';
+    if (this.mode === 'rated') return "You haven't rated any tracks in this window yet.";
     if (this.mode === 'in') return 'No songs shared with you in this window.';
     return 'No songs you shared in this window.';
+  }
+
+  // ── Genre filter ──────────────────────────────────────────────────
+  /** Distinct, non-empty genres present in the loaded window, sorted. */
+  get genres(): string[] {
+    const set = new Set<string>();
+    for (const s of this.allShares) {
+      const g = s.genre?.trim();
+      if (g) set.add(g);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }
+
+  /** The genre control only shows once the backend genre-fetch has populated
+   * at least one genre in the current window — otherwise it stays hidden. */
+  get genreEnabled(): boolean {
+    return this.genres.length > 0;
+  }
+
+  setGenre(genre: string | null): void {
+    this.genre = genre || null;
+    this.dataVersion++; // re-run the grouping/filter memo
+  }
+
+  // ── Ratings ───────────────────────────────────────────────────────
+  /** The track group's key for a representative share (for the stars control
+   * and the `/ratings/set` POST). */
+  keyFor(share: Share): string {
+    return trackKey(share);
+  }
+
+  ratingFor(share: Share): Rating | null | undefined {
+    return share.rating;
+  }
+
+  /**
+   * Set the caller's whole-group rating for a track. Updates every underlying
+   * share of the group optimistically (so the ×N breakdown and any other view
+   * of the same track reflect immediately), then persists via `/ratings/set`.
+   * The server's authoritative aggregate replaces the optimistic one on success;
+   * a failure reverts. Ratings never throw into the browse UI.
+   */
+  onRate(share: Share, value: number): void {
+    const key = trackKey(share);
+    const group = this.allShares.filter((s) => trackKey(s) === key);
+    const before = group.map((s) => (s.rating ? { ...s.rating } : null));
+
+    const optimistic = this.optimisticRating(share.rating, value);
+    for (const s of group) s.rating = { ...optimistic };
+    this.dataVersion++;
+
+    this.ratingsService.set(key, value).subscribe({
+      next: (agg) => {
+        for (const s of group) s.rating = { ...agg };
+        this.dataVersion++;
+      },
+      error: () => {
+        // Revert — a rating hiccup shouldn't strand the row.
+        group.forEach((s, i) => (s.rating = before[i]));
+        this.dataVersion++;
+      },
+    });
+  }
+
+  /** Recompute an aggregate as if the caller's rating changed to `value`. */
+  private optimisticRating(current: Rating | null | undefined, value: number): Rating {
+    const avg = current?.avg ?? 0;
+    const count = current?.count ?? 0;
+    const my = current?.myRating ?? 0;
+    const sum = avg * count - my + value;
+    const nextCount = my > 0 ? count : count + 1;
+    return {
+      avg: nextCount > 0 ? sum / nextCount : value,
+      count: nextCount,
+      myRating: value,
+    };
   }
 
   /** How many times the selected track appears across the deduped window. */
@@ -339,8 +440,8 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   // ── Internals ───────────────────────────────────────────────────
   private occurrencesOf(share: Share): Share[] {
-    const key = this.trackKey(share);
-    return this.dedupedShares.filter((s) => this.trackKey(s) === key);
+    const key = trackKey(share);
+    return this.dedupedShares.filter((s) => trackKey(s) === key);
   }
 
   /**
@@ -351,13 +452,13 @@ export class FeedComponent implements OnInit, OnDestroy {
    */
   private computeGroups() {
     const q = this.search.trim().toLowerCase();
-    const cacheKey = `${this.dataVersion}|${q}`;
+    const cacheKey = `${this.dataVersion}|${q}|${this.genre ?? ''}|${this.mode}`;
     if (this.groupCache?.key === cacheKey) return this.groupCache;
 
     const byKey = new Map<string, Share[]>();
     const order: string[] = [];
     for (const s of this.dedupedShares) {
-      const k = this.trackKey(s);
+      const k = trackKey(s);
       let arr = byKey.get(k);
       if (!arr) {
         arr = [];
@@ -390,9 +491,20 @@ export class FeedComponent implements OnInit, OnDestroy {
 
     let filteredReps = reps;
     if (q) {
-      filteredReps = reps.filter((rep) =>
-        (byKey.get(this.trackKey(rep)) ?? [rep]).some((s) => this.matchesSearch(s, q)),
+      filteredReps = filteredReps.filter((rep) =>
+        (byKey.get(trackKey(rep)) ?? [rep]).some((s) => this.matchesSearch(s, q)),
       );
+    }
+    // Genre filter — a group shows if any underlying share carries the genre.
+    if (this.genre) {
+      const g = this.genre;
+      filteredReps = filteredReps.filter((rep) =>
+        (byKey.get(trackKey(rep)) ?? [rep]).some((s) => s.genre?.trim() === g),
+      );
+    }
+    // "My rated" — only tracks the caller has rated (myRating > 0).
+    if (this.mode === 'rated') {
+      filteredReps = filteredReps.filter((rep) => (rep.rating?.myRating ?? 0) > 0);
     }
     filteredReps = [...filteredReps].sort((a, b) => (b.messageDate ?? 0) - (a.messageDate ?? 0));
 
@@ -401,7 +513,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   private groupSharers(share: Share): string[] {
-    return this.computeGroups().sharersByKey.get(this.trackKey(share)) ?? [];
+    return this.computeGroups().sharersByKey.get(trackKey(share)) ?? [];
   }
 
   private summarizeSharers(names: string[]): string {
@@ -423,34 +535,6 @@ export class FeedComponent implements OnInit, OnDestroy {
       .join(' ')
       .toLowerCase();
     return hay.includes(q);
-  }
-
-  /**
-   * Identity for "same track" grouping — Spotify id when resolved (robust
-   * across URL formats), else the normalised source URL, else title+artist.
-   * Used by BOTH the feed grouping and the modal's occurrence count so the
-   * card's ×N and the modal's "shared N times" always agree.
-   */
-  private trackKey(share: Share): string {
-    if (share.resolvedSpotifyId) return `sp:${share.resolvedSpotifyId}`;
-    const url = this.normalizedUrl(share.sourceUrl);
-    if (url) return `url:${url}`;
-    const title = (share.trackTitle ?? '').trim().toLowerCase();
-    const artist = (share.trackArtist ?? '').trim().toLowerCase();
-    return `ta:${title}|${artist}`;
-  }
-
-  /** host + path (no query/hash/trailing slash), lowercased — so the same link
-   * shared in slightly different forms still groups together. */
-  private normalizedUrl(raw?: string | null): string {
-    if (!raw) return '';
-    try {
-      const u = new URL(raw);
-      const path = u.pathname.replace(/\/+$/, '');
-      return `${u.host}${path}`.toLowerCase();
-    } catch {
-      return raw.trim().toLowerCase();
-    }
   }
 
   /** Identity for "same message" dedup — never collapses distinct shares. */

@@ -232,6 +232,13 @@
   flex: none;
 }
 
+/* Rating stars — interactive, so must sit above the whole-card trigger. */
+.card-rating {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+}
+
 .view-hint {
   display: inline-flex;
   align-items: center;
