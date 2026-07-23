@@ -103,6 +103,15 @@
   margin-bottom: 24px;
 }
 
+/* Direction + time-window tabs travel together on the left; the view toggle
+   is the .controls flex sibling that stays pushed to the far right. */
+.controls-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .segmented {
   display: inline-flex;
   padding: 4px;
@@ -169,6 +178,10 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  /* Equal-height rows: every tile in a row shares the tallest tile's height,
+     so an unmatched card (chip + "Open on Spotify") never makes the row ragged.
+     Cards stretch to fill via `.card { height: 100% }` (share-card.scss). */
+  grid-auto-rows: 1fr;
   gap: 18px;
 }
 

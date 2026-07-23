@@ -32,6 +32,8 @@
   </div>
 
   <div class="controls">
+    <!-- Left cluster: feed source + time window grouped together. -->
+    <div class="controls-left">
     <!-- Feed source: shared with me / by me / mine -->
     <div class="segmented" role="tablist" aria-label="Feed">
       <button
@@ -70,8 +72,9 @@
         {{ w.label }}
       </button>
     </div>
+    </div>
 
-    <!-- View toggle: tile grid / dense list -->
+    <!-- View toggle: tile grid / dense list (stays far right) -->
     <div class="segmented segmented--view" role="group" aria-label="Layout">
       <button
         type="button"

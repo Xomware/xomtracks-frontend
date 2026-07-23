@@ -2,6 +2,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  /* Fill the equal-height grid row (feed .grid uses grid-auto-rows: 1fr) so
+     every tile in a row is the same height regardless of match state. */
+  height: 100%;
   background: var(--xt-surface);
   border: 1px solid var(--xt-border);
   border-radius: var(--xt-radius-lg);

@@ -30,8 +30,33 @@
         class="header-btn header-btn--link"
         (click)="openLinkModal()"
       >Link number</button>
-      <span class="account-email" [title]="user.email">{{ user.email }}</span>
-      <button type="button" class="header-btn" (click)="signOut()">Sign out</button>
+
+      <!-- Account dropdown: username toggles a menu with Sign out. -->
+      <div class="account-menu">
+        <button
+          type="button"
+          class="account-trigger"
+          [attr.aria-expanded]="accountMenuOpen"
+          aria-haspopup="menu"
+          aria-controls="account-menu"
+          (click)="toggleAccountMenu($event)"
+        >
+          <span class="account-email" [title]="user.email">{{ user.email }}</span>
+          <span class="account-chevron" [class.account-chevron--open]="accountMenuOpen" aria-hidden="true">▾</span>
+        </button>
+        <ul
+          class="account-dropdown"
+          id="account-menu"
+          role="menu"
+          *ngIf="accountMenuOpen"
+        >
+          <li role="none">
+            <button type="button" role="menuitem" class="account-item" (click)="signOut()">
+              Sign out
+            </button>
+          </li>
+        </ul>
+      </div>
     </ng-container>
     <ng-template #signedOut>
       <a routerLink="/auth/sign-in" class="header-btn header-btn--primary">Sign in</a>
