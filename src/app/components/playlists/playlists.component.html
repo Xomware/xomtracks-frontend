@@ -1,5 +1,5 @@
-<section class="playlists">
-  <div class="pl-head">
+<section class="playlists" [class.playlists--embedded]="embedded">
+  <div class="pl-head" *ngIf="!embedded">
     <h1 class="pl-title">Playlists</h1>
     <p class="pl-sub">
       Two live playlists that roll up your shares on Spotify. Play, save, like,

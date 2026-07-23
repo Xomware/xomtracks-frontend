@@ -1,4 +1,5 @@
-<!-- Sticky edge tab (desktop) / bottom-right FAB (mobile) that opens the feed. -->
+<!-- Sticky VERTICAL edge tab (desktop) / bottom-right FAB (mobile) that opens
+     the playlists panel. The label reads bottom-to-top along the right edge. -->
 <button
   type="button"
   class="feed-tab"
@@ -7,8 +8,8 @@
   aria-controls="feed-panel"
   (click)="openPanel()"
 >
-  <span class="feed-tab-icon" aria-hidden="true">≡</span>
-  <span class="feed-tab-label">Browse feed</span>
+  <span class="feed-tab-icon" aria-hidden="true">♪</span>
+  <span class="feed-tab-label">Playlists</span>
 </button>
 
 <!-- Backdrop + panel, only mounted while open. -->
@@ -29,21 +30,21 @@
   >
     <header class="feed-drawer-head">
       <div class="feed-drawer-titles">
-        <span class="feed-drawer-eyebrow">Browse</span>
-        <h2 class="feed-drawer-title" id="feed-panel-title">The feed</h2>
+        <span class="feed-drawer-eyebrow">Rolling</span>
+        <h2 class="feed-drawer-title" id="feed-panel-title">Playlists</h2>
       </div>
       <button
         type="button"
         class="feed-drawer-close"
         (click)="close()"
-        aria-label="Close the feed"
+        aria-label="Close playlists"
       >
         <span aria-hidden="true">×</span>
       </button>
     </header>
 
     <div class="feed-drawer-body">
-      <app-feed [embedded]="true"></app-feed>
+      <app-playlists [embedded]="true"></app-playlists>
     </div>
   </aside>
 </div>

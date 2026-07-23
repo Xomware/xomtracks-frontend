@@ -1,9 +1,9 @@
 <ng-container *ngIf="cognito.isReady$ | async">
   <ng-container *ngIf="cognito.user$ | async; else publicPitch">
-    <!-- Playlists = app home: the rolling playlists are the primary screen. -->
-    <app-playlists></app-playlists>
+    <!-- The browse feed is the app home: full-page list/tile browsing. -->
+    <app-feed></app-feed>
 
-    <!-- The browse feed lives in a sticky, slide-out side panel / bottom sheet. -->
+    <!-- The rolling playlists live in a sticky, slide-out side panel / bottom sheet. -->
     <app-feed-panel></app-feed-panel>
   </ng-container>
 

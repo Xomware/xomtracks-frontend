@@ -47,9 +47,10 @@ export interface Share {
   matchConfidence?: number | null;
   createdAt: string;
 
-  /** Artist genre, when the backend genre-fetch has populated it. The genre
-   * filter reads this; while it's empty across the feed the control hides. */
-  genre?: string | null;
+  /** Artist genres, once the backend genre-fetch has populated them (e.g.
+   * `['tech house', 'house']`). The genre filter flattens these across the
+   * feed; while every share's list is empty the control stays hidden. */
+  genres?: string[] | null;
 
   /** Whole-group rating aggregate + the caller's own rating. Optional until
    * the backend enriches `/shares/list`; the UI degrades gracefully. */

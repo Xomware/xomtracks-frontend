@@ -14,7 +14,7 @@ import { ShareCardComponent } from './components/share-card/share-card.component
 import { RatingStarsComponent } from './components/rating-stars/rating-stars.component';
 import { TrackDetailModalComponent } from './components/track-detail-modal/track-detail-modal.component';
 import { PlaylistsComponent } from './components/playlists/playlists.component';
-import { LinkPhoneModalComponent } from './components/link-phone-modal/link-phone-modal.component';
+import { ProfileComponent } from './components/profile/profile.component';
 import { SignInComponent } from './components/auth/sign-in/sign-in.component';
 import { CallbackComponent } from './components/auth/callback/callback.component';
 
@@ -31,7 +31,7 @@ import { jwtInterceptor } from './interceptors/jwt.interceptor';
     RatingStarsComponent,
     TrackDetailModalComponent,
     PlaylistsComponent,
-    LinkPhoneModalComponent,
+    ProfileComponent,
     SignInComponent,
     CallbackComponent,
   ],

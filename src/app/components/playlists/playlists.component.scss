@@ -4,6 +4,12 @@
   padding: 28px clamp(16px, 4vw, 28px) 64px;
 }
 
+/* Inside the slide-out panel: full width, tighter padding (single column). */
+.playlists--embedded {
+  max-width: none;
+  padding: 18px 18px 40px;
+}
+
 .pl-head {
   margin-bottom: 24px;
 }
