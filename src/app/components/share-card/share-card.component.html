@@ -1,4 +1,14 @@
 <article class="card" [class.card--unmatched]="share.matchStatus === 'unmatched'">
+  <!-- Whole-card trigger: a real button (native keyboard support) laid over
+       the card via ::after. Sits under the "Open" link so that link stays
+       independently clickable. -->
+  <button
+    type="button"
+    class="card-trigger"
+    [attr.aria-label]="'View details for ' + title + (artist ? ' by ' + artist : '')"
+    (click)="activate()"
+  ></button>
+
   <div class="cover">
     <img
       *ngIf="hasArt; else noArt"
@@ -41,13 +51,21 @@
     </div>
 
     <a
-      class="open-link"
-      [href]="primaryUrl"
+      *ngIf="showOpenLink; else viewHint"
+      class="card-open"
+      [attr.data-platform]="share.platform"
+      [href]="openUrl"
       target="_blank"
       rel="noopener noreferrer"
     >
-      {{ primaryLinkLabel }}
-      <span class="open-arrow" aria-hidden="true">↗</span>
+      {{ openLinkLabel }}
+      <span class="card-open-arrow" aria-hidden="true">↗</span>
     </a>
+    <ng-template #viewHint>
+      <span class="view-hint">
+        View details
+        <span class="view-arrow" aria-hidden="true">→</span>
+      </span>
+    </ng-template>
   </div>
 </article>

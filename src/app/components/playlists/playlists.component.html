@@ -1,0 +1,42 @@
+<section class="playlists">
+  <div class="pl-head">
+    <h1 class="pl-title">Playlists</h1>
+    <p class="pl-sub">
+      Two live playlists that roll up your shares on Spotify. Play, save, like,
+      or share them right from here.
+      <span class="pl-refresh">↻ Auto-refreshes weekly.</span>
+    </p>
+  </div>
+
+  <div class="pl-grid">
+    <article class="pl-card" *ngFor="let playlist of playlists">
+      <div class="pl-card-head">
+        <h2 class="pl-card-title">{{ playlist.title }}</h2>
+        <p class="pl-card-blurb">{{ playlist.blurb }}</p>
+      </div>
+
+      <div class="pl-embed">
+        <iframe
+          class="pl-iframe"
+          [src]="playlist.embedUrl"
+          [title]="playlist.title + ' — Spotify player'"
+          width="100%"
+          height="380"
+          frameborder="0"
+          loading="lazy"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        ></iframe>
+      </div>
+
+      <a
+        class="pl-open"
+        [href]="playlist.openUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open in Spotify
+        <span class="pl-open-arrow" aria-hidden="true">↗</span>
+      </a>
+    </article>
+  </div>
+</section>

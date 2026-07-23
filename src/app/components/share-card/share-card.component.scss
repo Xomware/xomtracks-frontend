@@ -1,4 +1,5 @@
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--xt-surface);
@@ -14,8 +15,39 @@
     box-shadow: var(--xt-shadow-card);
   }
 
+  &:hover .view-hint {
+    color: var(--xt-cyan-600);
+  }
+
+  &:hover .view-arrow {
+    transform: translateX(3px);
+  }
+
+  &:focus-within {
+    border-color: var(--xt-border-strong);
+  }
+
   &--unmatched {
     opacity: 0.92;
+  }
+}
+
+/* Transparent full-card button — the primary "open details" action. */
+.card-trigger {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: -2px;
+    border-radius: var(--xt-radius-lg);
   }
 }
 
@@ -181,7 +213,7 @@
   flex: none;
 }
 
-.open-link {
+.view-hint {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -189,14 +221,46 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--xt-cyan);
-  text-decoration: none;
-  padding: 4px 2px;
-  border-radius: var(--xt-radius-sm);
   transition: color var(--xt-transition);
+}
+
+.view-arrow {
+  font-size: 0.95em;
+  transition: transform var(--xt-transition);
+}
+
+/* Inline outbound link for unmatched shares — must sit above .card-trigger. */
+.card-open {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: var(--xt-radius-pill);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--xt-text);
+  background: var(--xt-surface-3);
+  border: 1px solid var(--xt-border-strong);
+  transition: border-color var(--xt-transition), color var(--xt-transition),
+    background var(--xt-transition);
+
+  &[data-platform='soundcloud']:hover {
+    color: #ff8a3d;
+    border-color: #ff8a3d;
+  }
+  &[data-platform='apple']:hover {
+    color: #ff6ec7;
+    border-color: #ff6ec7;
+  }
 
   &:hover {
-    color: var(--xt-cyan-600);
-    text-decoration: underline;
+    background: var(--xt-surface-2);
+    color: var(--xt-cyan);
+    border-color: var(--xt-cyan-700);
   }
 
   &:focus-visible {
@@ -205,6 +269,6 @@
   }
 }
 
-.open-arrow {
+.card-open-arrow {
   font-size: 0.9em;
 }

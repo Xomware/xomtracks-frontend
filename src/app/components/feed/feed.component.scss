@@ -147,11 +147,265 @@
   box-shadow: 0 4px 14px var(--xt-cyan-glow);
 }
 
+/* ── View toggle ────────────────────────────────────────────────── */
+.segmented--view .view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.segmented--view .segmented-btn--active {
+  background: linear-gradient(135deg, var(--xt-cyan-600) 0%, var(--xt-cyan-700) 100%);
+  color: #04262b;
+  box-shadow: 0 4px 14px var(--xt-cyan-glow);
+}
+
+.view-ico {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 /* ── Grid ───────────────────────────────────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 18px;
+}
+
+/* ── List (dense, chart-like) ───────────────────────────────────── */
+$list-cols: 44px minmax(0, 1fr) 116px 140px 148px;
+
+.list {
+  border: 1px solid var(--xt-border);
+  border-radius: var(--xt-radius-lg);
+  overflow: hidden;
+  background: var(--xt-surface);
+}
+
+.list-head {
+  display: grid;
+  grid-template-columns: $list-cols;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: var(--xt-bg-2);
+  border-bottom: 1px solid var(--xt-border);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--xt-text-faint);
+
+  .col-date {
+    text-align: right;
+  }
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: $list-cols;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--xt-border);
+  color: var(--xt-text);
+  transition: background var(--xt-transition);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--xt-surface-2);
+  }
+
+  &:focus-within {
+    background: var(--xt-surface-2);
+  }
+
+  &--unmatched {
+    opacity: 0.9;
+  }
+}
+
+.row-trigger {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: -2px;
+  }
+}
+
+.row-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--xt-radius-sm);
+  object-fit: cover;
+  display: block;
+  background: var(--xt-surface-3);
+
+  &--fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: var(--xt-text-faint);
+
+    &[data-platform='spotify'] {
+      background: linear-gradient(135deg, #1db95433 0%, var(--xt-surface-2) 100%);
+    }
+    &[data-platform='soundcloud'] {
+      background: linear-gradient(135deg, #ff550033 0%, var(--xt-surface-2) 100%);
+    }
+    &[data-platform='apple'] {
+      background: linear-gradient(135deg, #fa57c133 0%, var(--xt-surface-2) 100%);
+    }
+  }
+}
+
+.col-track {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.row-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-artist {
+  font-size: 0.78rem;
+  color: var(--xt-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-platform .platform-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: var(--xt-radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--xt-text);
+  background: var(--xt-surface-3);
+  border: 1px solid var(--xt-border-strong);
+
+  &[data-platform='spotify'] {
+    color: #1ed760;
+  }
+  &[data-platform='soundcloud'] {
+    color: #ff8a3d;
+  }
+  &[data-platform='apple'] {
+    color: #ff6ec7;
+  }
+}
+
+.col-sharer {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: 0.84rem;
+  color: var(--xt-text-muted);
+}
+
+.sharer-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-cyan-700) 130%);
+  flex: none;
+}
+
+.row-sharer-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.col-date {
+  font-size: 0.82rem;
+  color: var(--xt-text-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Trailing outbound link for unmatched rows — above the row trigger. */
+.row-open {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 3px 10px;
+  border-radius: var(--xt-radius-pill);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--xt-text-muted);
+  background: var(--xt-surface-3);
+  border: 1px solid var(--xt-border-strong);
+  transition: color var(--xt-transition), border-color var(--xt-transition),
+    background var(--xt-transition);
+
+  &[data-platform='soundcloud']:hover {
+    color: #ff8a3d;
+    border-color: #ff8a3d;
+  }
+  &[data-platform='apple']:hover {
+    color: #ff6ec7;
+    border-color: #ff6ec7;
+  }
+
+  &:hover {
+    color: var(--xt-cyan);
+    border-color: var(--xt-cyan-700);
+    background: var(--xt-surface-2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+}
+
+.row-open-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Skeletons ──────────────────────────────────────────────────── */
@@ -261,6 +515,18 @@
   border-color: var(--xt-danger-border);
 }
 
+/* Tablet: drop the platform column so rows stay legible. */
+@media (max-width: 720px) {
+  .list-head,
+  .row {
+    grid-template-columns: 44px minmax(0, 1fr) 140px 148px;
+  }
+
+  .col-platform {
+    display: none;
+  }
+}
+
 @media (max-width: 560px) {
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -275,5 +541,25 @@
   .segmented {
     justify-content: center;
     overflow-x: auto;
+  }
+
+  /* Phone: cover + track + trailing actions; sharer folds away. */
+  .list-head,
+  .row {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+
+  .col-sharer {
+    display: none;
+  }
+
+  /* Compact the open link to just its icon to save width. */
+  .row-open-text {
+    display: none;
+  }
+
+  .row-open {
+    padding: 4px 8px;
   }
 }

@@ -1,0 +1,217 @@
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Share } from '../../models/share.model';
+import {
+  displayTitle,
+  isMatched,
+  openLabel,
+  platformLabel,
+  primaryUrl,
+} from '../../utils/track-display';
+
+type EmbedKind = 'spotify' | 'soundcloud' | null;
+
+const MATCH_LABELS: Record<Share['matchStatus'], string> = {
+  matched: 'Matched on Spotify',
+  manual: 'Matched (manual)',
+  unmatched: 'No Spotify match',
+  pending: 'Matching…',
+};
+
+/**
+ * Accessible detail modal for a single share. Shows the full metadata + any
+ * cross-feed stats (how many times the track was shared, who else shared it)
+ * and an outbound "Play on Spotify" link. Dialog is focus-trapped, Esc- and
+ * backdrop-closable, and restores focus to the trigger on close.
+ */
+@Component({
+  selector: 'app-track-detail-modal',
+  templateUrl: './track-detail-modal.component.html',
+  styleUrls: ['./track-detail-modal.component.scss'],
+})
+export class TrackDetailModalComponent implements AfterViewInit {
+  @Input({ required: true }) share!: Share;
+  /** Total times this track appears across the (deduped) feed, incl. this one. */
+  @Input() sharedTimes = 1;
+  /** Distinct sharers of the same track other than this share's sharer. */
+  @Input() otherSharers: string[] = [];
+
+  @Output() closed = new EventEmitter<void>();
+
+  @ViewChild('dialog') dialogRef!: ElementRef<HTMLElement>;
+
+  artFailed = false;
+  private previouslyFocused: HTMLElement | null = null;
+
+  constructor(private sanitizer: DomSanitizer) {}
+
+  ngAfterViewInit(): void {
+    this.previouslyFocused = document.activeElement as HTMLElement | null;
+    // Defer so the dialog is painted before we move focus into it.
+    queueMicrotask(() => this.focusFirst());
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.requestClose();
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    // Only close when the click lands on the backdrop itself, not the dialog.
+    if (event.target === event.currentTarget) this.requestClose();
+  }
+
+  /** Keep Tab focus inside the dialog while it's open. */
+  onKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Tab') return;
+    const focusables = this.focusableElements();
+    if (focusables.length === 0) {
+      event.preventDefault();
+      return;
+    }
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  requestClose(): void {
+    this.previouslyFocused?.focus?.();
+    this.closed.emit();
+  }
+
+  onArtError(): void {
+    this.artFailed = true;
+  }
+
+  private focusFirst(): void {
+    const focusables = this.focusableElements();
+    (focusables[0] ?? this.dialogRef?.nativeElement)?.focus?.();
+  }
+
+  private focusableElements(): HTMLElement[] {
+    const root = this.dialogRef?.nativeElement;
+    if (!root) return [];
+    const selector =
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+    return Array.from(root.querySelectorAll<HTMLElement>(selector)).filter(
+      (el) => el.offsetParent !== null || el === document.activeElement,
+    );
+  }
+
+  // ── Derived view data ─────────────────────────────────────────────
+  get platformLabel(): string {
+    return platformLabel(this.share.platform);
+  }
+
+  get hasArt(): boolean {
+    return !!this.share.albumArtUrl && !this.artFailed;
+  }
+
+  get title(): string {
+    return displayTitle(this.share);
+  }
+
+  get artist(): string {
+    return this.share.trackArtist?.trim() || '';
+  }
+
+  get album(): string {
+    return this.share.albumName?.trim() || '';
+  }
+
+  get sharer(): string {
+    if (this.share.direction === 'out') return 'You';
+    return this.share.sharerName?.trim() || this.share.sharerHandle?.trim() || 'Unknown';
+  }
+
+  get sharerInitial(): string {
+    return (this.sharer[0] ?? '?').toUpperCase();
+  }
+
+  get directionLabel(): string {
+    return this.share.direction === 'in' ? 'Shared with you' : 'Shared by you';
+  }
+
+  get matchStatusLabel(): string {
+    return MATCH_LABELS[this.share.matchStatus] ?? this.share.matchStatus;
+  }
+
+  get isMatched(): boolean {
+    return isMatched(this.share);
+  }
+
+  /** Which inline player, if any, we can embed for this share. */
+  get embedKind(): EmbedKind {
+    if (this.isMatched) return 'spotify';
+    if (this.share.platform === 'soundcloud' && this.share.sourceUrl) return 'soundcloud';
+    return null;
+  }
+
+  /** Sanitised iframe URL for the embeddable player (Spotify or SoundCloud). */
+  get embedUrl(): SafeResourceUrl | null {
+    const kind = this.embedKind;
+    if (kind === 'spotify') {
+      return this.sanitizer.bypassSecurityTrustResourceUrl(
+        `https://open.spotify.com/embed/track/${this.share.resolvedSpotifyId}`,
+      );
+    }
+    if (kind === 'soundcloud') {
+      const src = encodeURIComponent(this.share.sourceUrl);
+      // Brand the SoundCloud widget red; no autoplay so opening the modal is quiet.
+      return this.sanitizer.bypassSecurityTrustResourceUrl(
+        `https://w.soundcloud.com/player/?url=${src}` +
+          '&color=%23ff3750&auto_play=false&hide_related=true&show_comments=false&show_user=true',
+      );
+    }
+    return null;
+  }
+
+  get dateLabel(): string {
+    const ms = (this.share.messageDate ?? 0) * 1000;
+    if (!ms) return 'Unknown date';
+    return new Date(ms).toLocaleDateString(undefined, {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  /** Best outbound link: Spotify when resolved, else the original share URL. */
+  get primaryUrl(): string {
+    return primaryUrl(this.share);
+  }
+
+  get primaryLinkLabel(): string {
+    return openLabel(this.share);
+  }
+
+  get sharedTimesLabel(): string {
+    return this.sharedTimes === 1 ? 'Shared once' : `Shared ${this.sharedTimes} times`;
+  }
+
+  get otherSharersLabel(): string {
+    const names = this.otherSharers;
+    if (names.length === 0) return '';
+    if (names.length === 1) return `Also shared by ${names[0]}`;
+    if (names.length === 2) return `Also shared by ${names[0]} and ${names[1]}`;
+    return `Also shared by ${names[0]}, ${names[1]} +${names.length - 2} more`;
+  }
+}
