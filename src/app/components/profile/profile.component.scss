@@ -254,6 +254,95 @@
   font-size: 0.84rem;
 }
 
+/* ── Spotify connection card ───────────────────────────────────── */
+.pf-spotify-card {
+  margin-top: 14px;
+  border-left: 3px solid var(--xt-cyan);
+}
+
+/* Connected / Not connected status pill (top-right of the card head). */
+.pf-conn-status {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border-radius: var(--xt-radius-pill);
+  background: var(--xt-surface-2);
+  border: 1px solid var(--xt-border);
+  color: var(--xt-text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pf-conn-status--on {
+  background: var(--xt-cyan-soft);
+  border-color: rgba(102, 238, 251, 0.35);
+  color: var(--xt-cyan);
+}
+
+.pf-conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--xt-text-faint);
+}
+
+.pf-conn-status--on .pf-conn-dot {
+  background: var(--xt-cyan);
+  box-shadow: 0 0 8px var(--xt-cyan-glow);
+}
+
+.pf-spotify-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pf-spotify-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 20px;
+  border-radius: var(--xt-radius);
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--xt-red-glow);
+  transition: transform var(--xt-transition), box-shadow var(--xt-transition),
+    opacity var(--xt-transition);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px var(--xt-red-glow);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--xt-cyan);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.pf-spotify-glyph {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
 /* ── Totals ────────────────────────────────────────────────────── */
 .pf-stats {
   display: grid;

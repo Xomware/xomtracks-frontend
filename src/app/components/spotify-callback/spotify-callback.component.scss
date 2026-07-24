@@ -1,0 +1,36 @@
+// The shared .auth-* shell lives in global styles.scss. Only the bespoke
+// Spotify-success glyph is component-scoped here.
+
+// Cyan success glyph — the "Spotify connected ✓" confirmation.
+.sp-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
+  color: #06222a;
+  font-size: 1.7rem;
+  font-weight: 800;
+  box-shadow: 0 0 22px var(--xt-cyan-glow);
+  animation: spPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes spPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-check {
+    animation: none;
+  }
+}

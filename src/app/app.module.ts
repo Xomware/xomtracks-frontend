@@ -17,6 +17,7 @@ import { PlaylistsComponent } from './components/playlists/playlists.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SignInComponent } from './components/auth/sign-in/sign-in.component';
 import { CallbackComponent } from './components/auth/callback/callback.component';
+import { SpotifyCallbackComponent } from './components/spotify-callback/spotify-callback.component';
 
 import { jwtInterceptor } from './interceptors/jwt.interceptor';
 
@@ -34,6 +35,7 @@ import { jwtInterceptor } from './interceptors/jwt.interceptor';
     ProfileComponent,
     SignInComponent,
     CallbackComponent,
+    SpotifyCallbackComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule],
   // provideHttpClient(withInterceptors(...)) registers the functional

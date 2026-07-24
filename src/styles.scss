@@ -143,3 +143,9 @@ a {
     transform: scale(1);
   }
 }
+
+/* ── Shared auth-screen shell ──────────────────────────────────────
+   The .auth-* layout used by the sign-in, Cognito callback, and Spotify
+   callback screens. Globalised (namespaced classes, no leakage) so the
+   ~4 KB partial is emitted once instead of inlined per component. */
+@import './app/components/auth/auth-shell';
