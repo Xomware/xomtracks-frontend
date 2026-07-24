@@ -98,6 +98,54 @@
       </form>
     </section>
 
+    <!-- Spotify connection: per-user OAuth (Phase 2). Connect once to link the
+         caller's Spotify account for playlist creation on their behalf. -->
+    <section class="pf-card pf-spotify-card" aria-labelledby="pf-spotify-h">
+      <div class="pf-link-head">
+        <h2 class="pf-card-title" id="pf-spotify-h">Spotify connection</h2>
+        <span
+          class="pf-conn-status"
+          [class.pf-conn-status--on]="spotifyConnected"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="pf-conn-dot" aria-hidden="true"></span>
+          {{ spotifyConnected ? 'Connected' : 'Not connected' }}
+        </span>
+      </div>
+
+      <p class="pf-link-lede">
+        <ng-container *ngIf="spotifyConnected; else spotifyDisconnectedLede">
+          Your Spotify account is linked. Playlists built from your feed can be
+          saved straight to your library.
+        </ng-container>
+        <ng-template #spotifyDisconnectedLede>
+          Connect your Spotify account to build playlists from your feed and save
+          them to your library. You'll be sent to Spotify to approve access.
+        </ng-template>
+      </p>
+
+      <div class="pf-spotify-actions">
+        <button
+          type="button"
+          class="pf-spotify-btn"
+          (click)="connectSpotify()"
+          [disabled]="spotifyConnecting"
+        >
+          <span class="pf-spotify-glyph" aria-hidden="true">♫</span>
+          {{
+            spotifyConnecting
+              ? 'Redirecting to Spotify…'
+              : spotifyConnected
+                ? 'Reconnect Spotify'
+                : 'Connect Spotify'
+          }}
+        </button>
+      </div>
+
+      <p class="pf-link-error" *ngIf="spotifyError" role="alert">{{ spotifyError }}</p>
+    </section>
+
     <!-- Totals -->
     <div class="pf-stats" role="list" aria-label="Share totals">
       <div class="pf-stat" role="listitem">

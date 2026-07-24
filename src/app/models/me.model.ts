@@ -24,6 +24,12 @@ export interface MeInfo {
   linkedHandles: string[];
   /** How many shares are attributed to the caller (shown once linked). */
   shareCount: number;
+  /**
+   * Whether the caller has connected their Spotify account (Phase 2 OAuth).
+   * OPTIONAL: `/me/get` does not expose this yet — until it does, the Profile
+   * falls back to a client-side connected flag set after a successful callback.
+   */
+  spotifyConnected?: boolean;
 }
 
 /** POST /me/link-phone — acknowledgement of a link REQUEST (admin approves). */

@@ -5,6 +5,7 @@ import { HomeComponent } from './components/home/home.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SignInComponent } from './components/auth/sign-in/sign-in.component';
 import { CallbackComponent } from './components/auth/callback/callback.component';
+import { SpotifyCallbackComponent } from './components/spotify-callback/spotify-callback.component';
 import { authGuard } from './guards/auth.guard';
 
 /**
@@ -22,6 +23,9 @@ import { authGuard } from './guards/auth.guard';
  *   /playlists    legacy → home (playlists ARE the home).
  *   /auth/sign-in Hosted UI entry (SSO carry-over from any Xomware app).
  *   /auth/callback post-redirect landing.
+ *   /callback     Spotify OAuth redirect URI (per-user Spotify connect). This
+ *                 is the URI registered with Spotify — it must stay at the root
+ *                 (`/callback`), distinct from the Cognito `/auth/callback`.
  */
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -38,6 +42,9 @@ const routes: Routes = [
 
   { path: 'auth/sign-in', component: SignInComponent },
   { path: 'auth/callback', component: CallbackComponent },
+
+  // Spotify OAuth redirect URI (registered with Spotify as /callback).
+  { path: 'callback', component: SpotifyCallbackComponent },
 
   { path: '**', redirectTo: '' },
 ];

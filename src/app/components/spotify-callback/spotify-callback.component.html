@@ -1,0 +1,40 @@
+<div class="auth-shell">
+  <div class="auth-card">
+    <a routerLink="/" class="auth-brand" aria-label="Xomtracks home">
+      <img src="assets/img/xomtracks-icon-256.png" alt="" width="48" height="48" />
+      <span>Xomtracks</span>
+    </a>
+
+    <!-- Exchanging -->
+    <ng-container *ngIf="state === 'exchanging'">
+      <h1 class="auth-title">Connecting Spotify…</h1>
+      <p class="auth-subtitle" role="status" aria-live="polite">
+        Finishing the handshake — one moment.
+      </p>
+      <div class="callback-spinner">
+        <span class="spinner" aria-label="Connecting your Spotify account"></span>
+      </div>
+    </ng-container>
+
+    <!-- Success -->
+    <ng-container *ngIf="state === 'success'">
+      <div class="sp-check" aria-hidden="true">✓</div>
+      <h1 class="auth-title">Spotify connected</h1>
+      <p class="auth-subtitle" role="status" aria-live="polite">
+        You're all set. Taking you back to your profile…
+      </p>
+      <div class="auth-actions">
+        <a routerLink="/profile" class="auth-btn">Back to profile</a>
+      </div>
+    </ng-container>
+
+    <!-- Error -->
+    <ng-container *ngIf="state === 'error'">
+      <h1 class="auth-title">Couldn't connect Spotify</h1>
+      <p class="auth-error" role="alert">{{ errorMessage }}</p>
+      <div class="auth-actions">
+        <a routerLink="/profile" class="auth-btn">Back to profile</a>
+      </div>
+    </ng-container>
+  </div>
+</div>

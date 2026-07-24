@@ -4,6 +4,7 @@ import { catchError } from 'rxjs/operators';
 import { CognitoService } from '../../services/cognito.service';
 import { MeService } from '../../services/me.service';
 import { SharesService } from '../../services/shares.service';
+import { SpotifyService } from '../../services/spotify.service';
 import { Share } from '../../models/share.model';
 import { LinkStatus, MeInfo } from '../../models/me.model';
 import { displayTitle, trackKey } from '../../utils/track-display';
@@ -74,12 +75,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
   /** Non-empty when the submit failed — shown inline under the form. */
   linkError = '';
 
+  // ── Spotify connection (Phase 2 per-user OAuth) ──────────────────
+  /** Whether the caller's Spotify account is connected. Derived from
+   * `/me/get` (`spotifyConnected`) when present, else the client-side flag
+   * set after a successful callback. See report note re: the `/me/get` gap. */
+  spotifyConnected = false;
+  /** True while the `/auth/spotify-login` POST is in flight (before redirect). */
+  spotifyConnecting = false;
+  /** Non-empty when kicking off the connect failed — shown inline. */
+  spotifyError = '';
+
   private sub?: Subscription;
 
   constructor(
     private cognito: CognitoService,
     private meService: MeService,
     private sharesService: SharesService,
+    private spotify: SpotifyService,
   ) {}
 
   ngOnInit(): void {
@@ -151,6 +163,27 @@ export class ProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ── Spotify connect ──────────────────────────────────────────────
+  /** Kick off the per-user Spotify OAuth flow: POST `/auth/spotify-login`,
+   * stash the CSRF state, then redirect the browser to Spotify's consent
+   * screen. The `/callback` route completes the exchange on the way back. */
+  connectSpotify(): void {
+    if (this.spotifyConnecting) return;
+    this.spotifyConnecting = true;
+    this.spotifyError = '';
+    this.spotify.login().subscribe({
+      next: (data) => {
+        this.spotify.rememberState(data.state);
+        // Navigate away — the browser leaves the app for Spotify's consent UI.
+        window.location.assign(data.authorizeUrl);
+      },
+      error: () => {
+        this.spotifyConnecting = false;
+        this.spotifyError = "Couldn't start the Spotify connection. Please try again.";
+      },
+    });
+  }
+
   load(): void {
     this.state = 'loading';
     this.sub?.unsubscribe();
@@ -194,6 +227,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (!this.justSubmitted) {
       this.linkStatus = me.linkStatus ?? 'none';
     }
+    // Prefer the backend's Spotify status when it starts returning one; until
+    // then, fall back to the client-side flag set after a successful callback.
+    this.spotifyConnected = me.spotifyConnected ?? this.spotify.isConnectedLocally();
   }
 
   trackByLabel(_index: number, stat: CountStat): string {
