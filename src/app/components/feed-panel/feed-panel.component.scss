@@ -1,3 +1,5 @@
+@import 'tokens';
+
 /* ── Sticky VERTICAL edge tab ────────────────────────────────────── */
 .feed-tab {
   position: fixed;
@@ -20,9 +22,9 @@
   background: linear-gradient(160deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
   color: #fff;
   font: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: $text-xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-normal;
   cursor: pointer;
   box-shadow: -4px 0 18px rgba(0, 0, 0, 0.4), 0 0 18px var(--xt-red-glow);
   transition: transform var(--xt-transition), box-shadow var(--xt-transition),
@@ -65,7 +67,7 @@
 }
 
 .feed-tab-icon {
-  font-size: 1.05rem;
+  font-size: $text-base;
   line-height: 1;
   /* Keep the glyph upright inside the vertical tab. */
   writing-mode: horizontal-tb;
@@ -110,18 +112,18 @@
 
 .feed-drawer-eyebrow {
   display: block;
-  font-size: 0.66rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: $tracking-wider;
   color: var(--xt-cyan);
 }
 
 .feed-drawer-title {
   margin: 2px 0 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: $text-lg;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-tight;
 }
 
 .feed-drawer-close {
@@ -135,7 +137,7 @@
   border-radius: 50%;
   background: var(--xt-surface);
   color: var(--xt-text-muted);
-  font-size: 1.35rem;
+  font-size: $text-lg;
   line-height: 1;
   cursor: pointer;
   transition: background var(--xt-transition), color var(--xt-transition),

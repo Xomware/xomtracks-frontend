@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .hero {
   min-height: calc(100vh - 60px);
   display: flex;
@@ -26,13 +28,13 @@
 
 .hero-title {
   font-size: clamp(1.8rem, 5vw, 2.6rem);
-  font-weight: 800;
+  font-weight: $font-weight-extrabold;
   margin: 0 0 16px;
-  letter-spacing: -0.02em;
+  letter-spacing: $tracking-tight;
 }
 
 .hero-lede {
-  font-size: 1.05rem;
+  font-size: $text-base;
   line-height: 1.6;
   color: var(--xt-text-muted);
   margin: 0 auto 28px;
@@ -53,8 +55,8 @@
   padding: 14px 28px;
   border-radius: var(--xt-radius-pill);
   font: inherit;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
   text-decoration: none;
   cursor: pointer;
   transition: transform var(--xt-transition), box-shadow var(--xt-transition);
@@ -85,7 +87,7 @@
   gap: 10px;
   text-align: left;
   color: var(--xt-text-muted);
-  font-size: 0.92rem;
+  font-size: $text-sm;
 
   li {
     display: flex;

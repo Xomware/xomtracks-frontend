@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -42,7 +44,7 @@
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.5);
   color: var(--xt-text-muted);
-  font-size: 1.5rem;
+  font-size: $text-xl;
   line-height: 1;
   cursor: pointer;
   transition: color var(--xt-transition), background var(--xt-transition),
@@ -115,7 +117,7 @@
 }
 
 .cover-fallback-mark {
-  font-size: 3rem;
+  font-size: $text-5xl;
   color: var(--xt-text-faint);
   opacity: 0.7;
 }
@@ -137,9 +139,9 @@
   align-self: flex-start;
   padding: 3px 10px;
   border-radius: var(--xt-radius-pill);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-normal;
   color: #fff;
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -160,23 +162,23 @@
 }
 
 .detail-title {
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-size: $text-lg;
+  font-weight: $font-weight-extrabold;
   margin: 4px 0 0;
-  letter-spacing: -0.02em;
+  letter-spacing: $tracking-tight;
   line-height: 1.15;
 }
 
 .detail-artist {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: $text-base;
+  font-weight: $font-weight-semibold;
   color: var(--xt-text);
 }
 
 .detail-album {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: $text-sm;
   color: var(--xt-text-muted);
 }
 
@@ -190,8 +192,8 @@
 .stat-pill {
   padding: 4px 11px;
   border-radius: var(--xt-radius-pill);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
   color: var(--xt-cyan);
   background: var(--xt-cyan-soft);
   border: 1px solid rgba(102, 238, 251, 0.28);
@@ -211,8 +213,8 @@
   margin-top: 12px;
   padding: 10px 20px;
   border-radius: var(--xt-radius-pill);
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: $text-sm;
+  font-weight: $font-weight-bold;
   color: #fff;
   text-decoration: none;
   background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
@@ -235,6 +237,9 @@
 }
 
 .play-arrow {
+  // Deliberately `em`: this glyph scales with the label beside it. A rem
+  // token would pin it to one size and break that relationship.
+  // stylelint-disable-next-line declaration-property-value-allowed-list
   font-size: 0.9em;
 }
 
@@ -273,16 +278,16 @@
 
   dt {
     margin: 0 0 3px;
-    font-size: 0.72rem;
-    font-weight: 700;
+    font-size: $text-2xs;
+    font-weight: $font-weight-bold;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: $tracking-wide;
     color: var(--xt-text-faint);
   }
 
   dd {
     margin: 0;
-    font-size: 0.92rem;
+    font-size: $text-sm;
     color: var(--xt-text);
     word-break: break-word;
   }
@@ -301,8 +306,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   color: #fff;
   background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-cyan-700) 130%);
   flex: none;
@@ -333,19 +338,19 @@
   align-items: center;
   gap: 8px;
   margin: 0 0 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: $tracking-wide;
   color: var(--xt-text-faint);
 }
 
 .breakdown-head .count-badge {
   padding: 1px 8px;
   border-radius: var(--xt-radius-pill);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0;
+  font-size: $text-3xs;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-normal;
   color: #04262b;
   background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
   box-shadow: 0 1px 6px var(--xt-cyan-glow);
@@ -366,7 +371,7 @@
   gap: 10px;
   padding: 9px 12px;
   border-bottom: 1px solid var(--xt-border);
-  font-size: 0.86rem;
+  font-size: $text-sm;
 
   &:last-child {
     border-bottom: none;
@@ -385,7 +390,7 @@
   margin-left: auto;
   flex: none;
   color: var(--xt-text-muted);
-  font-size: 0.8rem;
+  font-size: $text-xs;
 }
 
 @keyframes backdrop-in {
@@ -422,7 +427,7 @@
 }
 
 .rate-label {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   color: var(--xt-text-muted);
 }
