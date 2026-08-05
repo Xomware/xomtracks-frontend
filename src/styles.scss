@@ -1,3 +1,5 @@
+@import 'tokens';
+
 /* =====================================================================
    Xomtracks — global design tokens + base styles
    Brand: RED (primary, #ff3750) + CYAN (accent, #66eefb), sampled straight
@@ -89,7 +91,7 @@ body {
   background: var(--xt-bg);
   color: var(--xt-text);
   font-family: var(--xt-font);
-  font-size: 15px;
+  font-size: $text-sm;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -100,7 +102,7 @@ h2,
 h3 {
   color: var(--xt-text);
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: $tracking-tight;
 }
 
 a {

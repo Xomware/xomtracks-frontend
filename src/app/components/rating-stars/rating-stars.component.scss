@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .rating {
   display: inline-flex;
   align-items: center;
@@ -19,7 +21,7 @@
   border: 0;
   background: transparent;
   color: var(--xt-surface-3);
-  font-size: 0.95rem;
+  font-size: $text-base;
   line-height: 1;
   cursor: pointer;
   transition: color var(--xt-transition), transform var(--xt-transition);
@@ -52,7 +54,7 @@
 }
 
 .rating--md .star {
-  font-size: 1.35rem;
+  font-size: $text-lg;
   padding: 3px;
 }
 
@@ -64,17 +66,17 @@
   display: inline-flex;
   align-items: baseline;
   gap: 3px;
-  font-size: 0.74rem;
+  font-size: $text-2xs;
   color: var(--xt-text-muted);
   white-space: nowrap;
 }
 
 .rating--md .rating-summary {
-  font-size: 0.85rem;
+  font-size: $text-sm;
 }
 
 .rating-avg {
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   color: var(--xt-text);
 }
 
@@ -82,7 +84,7 @@
   color: var(--xt-text-faint);
 
   &--empty {
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     color: var(--xt-text-faint);
   }
 }

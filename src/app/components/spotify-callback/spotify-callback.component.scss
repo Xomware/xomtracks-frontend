@@ -1,3 +1,5 @@
+@import 'tokens';
+
 // The shared .auth-* shell lives in global styles.scss. Only the bespoke
 // Spotify-success glyph is component-scoped here.
 
@@ -12,8 +14,8 @@
   border-radius: 50%;
   background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
   color: #06222a;
-  font-size: 1.7rem;
-  font-weight: 800;
+  font-size: $text-2xl;
+  font-weight: $font-weight-extrabold;
   box-shadow: 0 0 22px var(--xt-cyan-glow);
   animation: spPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }

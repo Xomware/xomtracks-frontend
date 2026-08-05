@@ -44,13 +44,21 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets",
-                "ignore": ["**/*-source.png"]
+                "ignore": [
+                  "**/*-source.png"
+                ]
               }
             ],
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles",
+                "src"
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -115,13 +123,21 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets",
-                "ignore": ["**/*-source.png"]
+                "ignore": [
+                  "**/*-source.png"
+                ]
               }
             ],
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles",
+                "src"
+              ]
+            }
           }
         }
       }

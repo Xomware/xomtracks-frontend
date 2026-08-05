@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .app-header {
   display: flex;
   align-items: center;
@@ -40,7 +42,7 @@
 
 .account-email {
   color: var(--xt-header-muted);
-  font-size: 13px;
+  font-size: $text-xs;
   max-width: 42vw;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -90,7 +92,7 @@
 }
 
 .account-chevron {
-  font-size: 11px;
+  font-size: $text-3xs;
   line-height: 1;
   transition: transform var(--xt-transition);
 
@@ -124,8 +126,8 @@
   background: transparent;
   color: var(--xt-text);
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   text-align: left;
   cursor: pointer;
   transition: background var(--xt-transition), color var(--xt-transition);
@@ -168,8 +170,8 @@
 
 .header-link {
   color: var(--xt-header-muted);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   text-decoration: none;
   padding: 6px 4px;
   border-radius: var(--xt-radius-sm);
@@ -199,8 +201,8 @@
   background: rgba(255, 255, 255, 0.04);
   color: var(--xt-header-text);
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   text-decoration: none;
   cursor: pointer;
   transition: background var(--xt-transition), border-color var(--xt-transition);

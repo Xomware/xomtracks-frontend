@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .card {
   position: relative;
   display: flex;
@@ -58,8 +60,8 @@
   backdrop-filter: blur(6px);
   color: #fff;
   font: inherit;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   line-height: 1;
   cursor: pointer;
   opacity: 0;
@@ -98,7 +100,7 @@
 }
 
 .heard-check {
-  font-size: 12px;
+  font-size: $text-2xs;
 }
 
 /* Transparent full-card button — the primary "open details" action. */
@@ -153,7 +155,7 @@
 }
 
 .cover-fallback-mark {
-  font-size: 2.6rem;
+  font-size: $text-4xl;
   color: var(--xt-text-faint);
   opacity: 0.7;
 }
@@ -164,9 +166,9 @@
   bottom: 10px;
   padding: 3px 9px;
   border-radius: var(--xt-radius-pill);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-normal;
   color: #fff;
   background: rgba(0, 0, 0, 0.62);
   backdrop-filter: blur(6px);
@@ -190,9 +192,9 @@
   right: 10px;
   padding: 2px 9px;
   border-radius: var(--xt-radius-pill);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.01em;
+  font-size: $text-2xs;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-normal;
   color: #04262b;
   background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
   box-shadow: 0 2px 10px var(--xt-cyan-glow);
@@ -212,8 +214,8 @@
 }
 
 .track-title {
-  font-size: 0.98rem;
-  font-weight: 700;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
   margin: 0 0 3px;
   white-space: nowrap;
   overflow: hidden;
@@ -221,7 +223,7 @@
 }
 
 .track-artist {
-  font-size: 0.85rem;
+  font-size: $text-sm;
   color: var(--xt-text-muted);
   margin: 0;
   white-space: nowrap;
@@ -237,8 +239,8 @@
   align-self: flex-start;
   padding: 3px 10px;
   border-radius: var(--xt-radius-pill);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   border: 1px solid transparent;
 
   &[data-kind='unmatched'] {
@@ -257,7 +259,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.8rem;
+  font-size: $text-xs;
   color: var(--xt-text-muted);
   margin-top: auto;
 }
@@ -276,8 +278,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   color: #fff;
   background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-cyan-700) 130%);
   flex: none;
@@ -310,13 +312,16 @@
   align-items: center;
   gap: 5px;
   align-self: flex-start;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
   color: var(--xt-cyan);
   transition: color var(--xt-transition);
 }
 
 .view-arrow {
+  // Deliberately `em`: this glyph scales with the label beside it. A rem
+  // token would pin it to one size and break that relationship.
+  // stylelint-disable-next-line declaration-property-value-allowed-list
   font-size: 0.95em;
   transition: transform var(--xt-transition);
 }
@@ -331,8 +336,8 @@
   align-self: flex-start;
   padding: 6px 12px;
   border-radius: var(--xt-radius-pill);
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: $text-xs;
+  font-weight: $font-weight-bold;
   text-decoration: none;
   color: var(--xt-text);
   background: var(--xt-surface-3);
@@ -362,5 +367,8 @@
 }
 
 .card-open-arrow {
+  // Deliberately `em`: this glyph scales with the label beside it. A rem
+  // token would pin it to one size and break that relationship.
+  // stylelint-disable-next-line declaration-property-value-allowed-list
   font-size: 0.9em;
 }

@@ -1,3 +1,5 @@
+@import 'tokens';
+
 .profile {
   max-width: 980px;
   margin: 0 auto;
@@ -24,8 +26,8 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: $text-2xl;
+  font-weight: $font-weight-extrabold;
   color: #fff;
   background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
   box-shadow: 0 4px 16px var(--xt-red-glow);
@@ -37,18 +39,18 @@
 
 .pf-eyebrow {
   margin: 0;
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: $tracking-wide;
   color: var(--xt-cyan);
 }
 
 .pf-email {
   margin: 3px 0 0;
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: $text-xl;
+  font-weight: $font-weight-extrabold;
+  letter-spacing: $tracking-tight;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -74,17 +76,17 @@
   background: var(--xt-surface-2);
   border: 1px solid var(--xt-border);
   color: var(--xt-text-faint);
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: $text-3xs;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: $tracking-wide;
 }
 
 .pf-link-lede {
   margin: 6px 0 14px;
   max-width: 62ch;
   color: var(--xt-text-muted);
-  font-size: 0.88rem;
+  font-size: $text-sm;
 
   strong {
     color: var(--xt-text);
@@ -112,8 +114,8 @@
   border-radius: 50%;
   background: linear-gradient(135deg, var(--xt-cyan) 0%, var(--xt-cyan-600) 100%);
   color: #06222a;
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: $text-lg;
+  font-weight: $font-weight-extrabold;
   box-shadow: 0 0 16px var(--xt-cyan-glow);
 }
 
@@ -123,15 +125,15 @@
 
 .pf-pending-title {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: $text-base;
+  font-weight: $font-weight-extrabold;
   color: var(--xt-text);
 }
 
 .pf-pending-text {
   margin: 2px 0 0;
   color: var(--xt-text-muted);
-  font-size: 0.86rem;
+  font-size: $text-sm;
 }
 
 /* Linked confirmation — approved; reuses the pending layout with a red badge. */
@@ -155,8 +157,8 @@
   border-radius: 50%;
   background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
   color: #fff;
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: $text-lg;
+  font-weight: $font-weight-extrabold;
   box-shadow: 0 0 16px var(--xt-red-glow);
 }
 
@@ -168,8 +170,8 @@
 .pf-field-label {
   display: block;
   margin-bottom: 6px;
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
   color: var(--xt-text-muted);
 }
 
@@ -188,7 +190,7 @@
   border-radius: var(--xt-radius);
   color: var(--xt-text);
   font: inherit;
-  font-size: 0.95rem;
+  font-size: $text-base;
   transition: border-color var(--xt-transition), box-shadow var(--xt-transition);
 
   &::placeholder {
@@ -215,7 +217,7 @@
   background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
   color: #fff;
   font: inherit;
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   cursor: pointer;
   box-shadow: 0 4px 14px var(--xt-red-glow);
   transition: transform var(--xt-transition), box-shadow var(--xt-transition),
@@ -241,7 +243,7 @@
 .pf-field-hint {
   margin: 8px 0 0;
   color: var(--xt-text-faint);
-  font-size: 0.78rem;
+  font-size: $text-2xs;
 }
 
 .pf-link-error {
@@ -251,7 +253,7 @@
   background: var(--xt-danger-bg);
   border: 1px solid var(--xt-danger-border);
   color: var(--xt-danger-text);
-  font-size: 0.84rem;
+  font-size: $text-xs;
 }
 
 /* ── Spotify connection card ───────────────────────────────────── */
@@ -271,10 +273,10 @@
   background: var(--xt-surface-2);
   border: 1px solid var(--xt-border);
   color: var(--xt-text-muted);
-  font-size: 0.74rem;
-  font-weight: 700;
+  font-size: $text-2xs;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: $tracking-wide;
 }
 
 .pf-conn-status--on {
@@ -311,7 +313,7 @@
   background: linear-gradient(135deg, var(--xt-red) 0%, var(--xt-red-600) 100%);
   color: #fff;
   font: inherit;
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   cursor: pointer;
   box-shadow: 0 4px 14px var(--xt-red-glow);
   transition: transform var(--xt-transition), box-shadow var(--xt-transition),
@@ -339,7 +341,7 @@
 }
 
 .pf-spotify-glyph {
-  font-size: 1.05rem;
+  font-size: $text-base;
   line-height: 1;
 }
 
@@ -367,16 +369,16 @@
 }
 
 .pf-stat-value {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: $text-3xl;
+  font-weight: $font-weight-extrabold;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: $tracking-tight;
 }
 
 .pf-stat-label {
   color: var(--xt-text-muted);
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
 }
 
 /* ── Two-column cards ──────────────────────────────────────────── */
@@ -405,9 +407,9 @@
 
 .pf-card-title {
   margin: 0 0 12px;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: $text-base;
+  font-weight: $font-weight-bold;
+  letter-spacing: $tracking-tight;
 }
 
 /* Ranked list (top sharers) */
@@ -441,8 +443,8 @@
     border-radius: 50%;
     background: var(--xt-surface-2);
     color: var(--xt-text-faint);
-    font-size: 0.72rem;
-    font-weight: 700;
+    font-size: $text-2xs;
+    font-weight: $font-weight-bold;
   }
 }
 
@@ -452,15 +454,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: $font-weight-semibold;
+  font-size: $text-sm;
 }
 
 .pf-rank-count {
   flex: none;
   color: var(--xt-cyan);
-  font-weight: 700;
-  font-size: 0.86rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-sm;
   font-variant-numeric: tabular-nums;
 }
 
@@ -482,13 +484,13 @@
   border-radius: var(--xt-radius-pill);
   background: var(--xt-surface-2);
   border: 1px solid var(--xt-border);
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: $text-xs;
+  font-weight: $font-weight-semibold;
 }
 
 .pf-genre-count {
   color: var(--xt-cyan);
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   font-variant-numeric: tabular-nums;
 }
 
@@ -540,8 +542,8 @@
 }
 
 .pf-rated-title {
-  font-weight: 600;
-  font-size: 0.92rem;
+  font-weight: $font-weight-semibold;
+  font-size: $text-sm;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -549,7 +551,7 @@
 
 .pf-rated-artist {
   color: var(--xt-text-muted);
-  font-size: 0.82rem;
+  font-size: $text-xs;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -557,12 +559,12 @@
 
 .pf-rated-stars {
   flex: none;
-  letter-spacing: 1px;
+  letter-spacing: $tracking-wide;
 }
 
 .pf-star {
   color: var(--xt-surface-3);
-  font-size: 0.95rem;
+  font-size: $text-base;
 }
 
 .pf-star--on {
@@ -572,7 +574,7 @@
 .pf-empty {
   margin: 0;
   color: var(--xt-text-faint);
-  font-size: 0.86rem;
+  font-size: $text-sm;
 }
 
 /* ── Quick links ───────────────────────────────────────────────── */
@@ -618,7 +620,7 @@
   border-radius: var(--xt-radius);
   background: var(--xt-cyan-soft);
   color: var(--xt-cyan);
-  font-size: 1.1rem;
+  font-size: $text-md;
 }
 
 .pf-link-body {
@@ -630,19 +632,19 @@
 }
 
 .pf-link-title {
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: $font-weight-bold;
+  font-size: $text-base;
 }
 
 .pf-link-sub {
   color: var(--xt-text-muted);
-  font-size: 0.8rem;
+  font-size: $text-xs;
 }
 
 .pf-link-arrow {
   flex: none;
   color: var(--xt-text-faint);
-  font-size: 1.1rem;
+  font-size: $text-md;
   transition: transform var(--xt-transition), color var(--xt-transition);
 }
 
@@ -658,12 +660,12 @@
 }
 
 .pf-state-emoji {
-  font-size: 2.4rem;
+  font-size: $text-4xl;
 }
 
 .pf-state-title {
   margin: 12px 0 4px;
-  font-size: 1.2rem;
+  font-size: $text-lg;
 }
 
 .pf-state-text {
@@ -678,7 +680,7 @@
   background: var(--xt-surface-2);
   color: var(--xt-text);
   font: inherit;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   cursor: pointer;
   transition: background var(--xt-transition), border-color var(--xt-transition);
 
@@ -765,6 +767,6 @@
   }
 
   .pf-email {
-    font-size: 1.2rem;
+    font-size: $text-lg;
   }
 }
