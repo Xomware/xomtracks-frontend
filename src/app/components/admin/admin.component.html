@@ -17,7 +17,7 @@
 
   <!-- Not authorized (403) -->
   <div class="ad-state" *ngIf="state === 'forbidden'" role="alert">
-    <div class="ad-state-emoji" aria-hidden="true">🔒</div>
+    <div class="ad-state-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div>
     <h2 class="ad-state-title">Not authorized</h2>
     <p class="ad-state-text">This area is for Xomtracks admins only.</p>
     <a class="ad-btn" routerLink="/">Back to home</a>
@@ -25,7 +25,7 @@
 
   <!-- Error -->
   <div class="ad-state" *ngIf="state === 'error'" role="alert">
-    <div class="ad-state-emoji" aria-hidden="true">⚠️</div>
+    <div class="ad-state-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg></div>
     <h2 class="ad-state-title">Couldn't load requests</h2>
     <p class="ad-state-text">Something went wrong reaching the Xomtracks API.</p>
     <button type="button" class="ad-btn" (click)="retry()">Try again</button>
@@ -73,7 +73,7 @@
 
     <ng-template #noRequests>
       <div class="ad-state ad-state--empty">
-        <div class="ad-state-emoji" aria-hidden="true">✅</div>
+        <div class="ad-state-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
         <h2 class="ad-state-title">All caught up</h2>
         <p class="ad-state-text">No pending link requests right now.</p>
       </div>
